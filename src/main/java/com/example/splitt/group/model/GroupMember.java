@@ -48,12 +48,6 @@ public class GroupMember {
     @Enumerated(EnumType.STRING)
     private MemberStatus status;
 
-    public GroupMember(User member, Group group, MemberStatus status) {
-        this.member = member;
-        this.group = group;
-        this.status = status;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

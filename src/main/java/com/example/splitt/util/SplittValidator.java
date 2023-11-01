@@ -12,10 +12,6 @@ import java.util.function.Predicate;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class SplittValidator {
 
-    public boolean isEmpty(String str) {
-        return str != null && str.trim().isEmpty();
-    }
-
     public Predicate<String> isNotBlankString() {
         return str -> str != null && !str.trim().isEmpty();
     }

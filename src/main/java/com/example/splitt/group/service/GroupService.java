@@ -1,6 +1,10 @@
 package com.example.splitt.group.service;
 
-import com.example.splitt.group.dto.*;
+import com.example.splitt.group.dto.GroupCreateDto;
+import com.example.splitt.group.dto.GroupOutputDto;
+import com.example.splitt.group.dto.GroupOutputShortDto;
+import com.example.splitt.group.dto.GroupUpdateDto;
+import com.example.splitt.group.dto.GroupUpdateMembersDto;
 
 import java.util.List;
 
@@ -15,4 +19,5 @@ public interface GroupService {
     GroupOutputShortDto updateProperties(GroupUpdateDto dto);
 
     GroupOutputDto updateMembers(GroupUpdateMembersDto dto);
+
 }

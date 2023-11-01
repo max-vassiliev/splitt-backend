@@ -1,6 +1,5 @@
 package com.example.splitt.group.dto;
 
-import com.example.splitt.group.dto.member.MemberInputDto;
 import com.example.splitt.group.dto.member.NewMemberInputDto;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -21,7 +20,6 @@ public class GroupCreateDto {
     @NotBlank(message = "Group Title Is Empty. Please add group title.")
     private String title;
 
-//    private List<MemberInputDto> members;
     private List<NewMemberInputDto> members;
 
 }

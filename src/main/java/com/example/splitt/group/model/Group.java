@@ -15,7 +15,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "groups", schema = "public")
@@ -34,7 +38,6 @@ public class Group {
 
     @Transient
     private Set<User> members;
-//    private List<GroupMember> members;
 
     @Transient
     private List<Bill> bills;
@@ -42,7 +45,7 @@ public class Group {
     @Transient
     private List<Transaction> transactions;
 
-    // @Transient
+    // TODO @Transient
     // activities
 
     public Group(String title) {

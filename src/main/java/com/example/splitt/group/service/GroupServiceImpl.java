@@ -2,7 +2,11 @@ package com.example.splitt.group.service;
 
 import com.example.splitt.error.exception.CustomValidationException;
 import com.example.splitt.error.exception.EntityNotFoundException;
-import com.example.splitt.group.dto.*;
+import com.example.splitt.group.dto.GroupCreateDto;
+import com.example.splitt.group.dto.GroupOutputDto;
+import com.example.splitt.group.dto.GroupOutputShortDto;
+import com.example.splitt.group.dto.GroupUpdateDto;
+import com.example.splitt.group.dto.GroupUpdateMembersDto;
 import com.example.splitt.group.dto.member.MemberInputDto;
 import com.example.splitt.group.dto.member.CurrentMemberInputDto;
 import com.example.splitt.group.dto.member.NewMemberInputDto;
@@ -22,7 +26,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -54,13 +64,18 @@ public class GroupServiceImpl implements GroupService {
         Group group = groupRequester.getGroup();
 
         List<GroupMember> foundGroupMembers = getMembersByGroupId(groupId);
-        Set<User> groupMembers = foundGroupMembers.stream()
-                .map(GroupMember::getMember)
-                .collect(Collectors.toCollection(LinkedHashSet::new));
-        group.setMembers(groupMembers);
+        populateGroup(group, foundGroupMembers);
 
         return groupMapper.toGroupOutputDto(group);
     }
+
+    private void populateGroup(Group group, List<GroupMember> groupMembers) {
+        Set<User> members = groupMembers.stream()
+                .map(GroupMember::getMember)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+        group.setMembers(members);
+    }
+
 
     @Override
     public List<GroupOutputShortDto> findAllByUserId(Long userId) {
@@ -94,28 +109,6 @@ public class GroupServiceImpl implements GroupService {
 
         return groupMapper.toGroupOutputDto(savedGroup);
     }
-
-//    @Override
-//    @Transactional
-//    public GroupOutputDto update(GroupUpdateDto dto) {
-//        GroupMemberId searchId = new GroupMemberId(dto.getRequesterId(), dto.getGroupId());
-//        GroupMember groupRequester = getGroupMemberById(searchId);
-//        validateRequesterIsRegistered(groupRequester.getMember());
-//
-//        // TODO придумать, как доставать пользователей
-//        // нужно ли доставать всех пользователей, если обновляем только название группы?
-//        // может, разбить на отдельные методы: один для groupProperties, другой — для GroupMembers
-//        Group group = groupRequester.getGroup();
-//
-//        updateGroupProperties(group, dto);
-////        updateCurrentGroupMembers(group, dto.getCurrentMembers());
-//        addNewMembersToGroup(group, dto.getNewMembers());
-//
-//        groupMemberRepository.flush();
-//        groupRepository.flush();
-//
-//        return groupMapper.toGroupOutputDto(group);
-//    }
 
     @Override
     @Transactional
@@ -155,7 +148,6 @@ public class GroupServiceImpl implements GroupService {
 
         return groupMapper.toGroupOutputDto(group);
     }
-
 
     // -------------
     // Repository
@@ -301,15 +293,9 @@ public class GroupServiceImpl implements GroupService {
                                            Group group,
                                            List<CurrentMemberInputDto> membersToUpdateDto) {
         if (membersToUpdateDto == null || membersToUpdateDto.isEmpty()) {
-            Set<User> members = groupMembers.stream()
-                    .map(GroupMember::getMember)
-                    .collect(Collectors.toCollection(LinkedHashSet::new));
-            group.setMembers(members);
+            populateGroup(group, groupMembers);
             return;
         }
-
-        // TODO удалить, если всё ок
-//        validateProcessMembersListNotLong(membersToUpdateDto);
 
         Map<Long, GroupMember> groupMembersToUpdate = groupMembers.stream()
                 .collect(Collectors.toMap(gm -> gm.getMember().getId(), groupMember -> groupMember));
@@ -334,29 +320,6 @@ public class GroupServiceImpl implements GroupService {
         group.setMembers(new LinkedHashSet<>(members.values()));
     }
 
-//    // TODO сюда нужно передавать не группу, а список groupMembers
-//    private void updateCurrentGroupMembers(Group group, List<MemberUpdateDto> membersToUpdate) {
-//        if (membersToUpdate.isEmpty()) return;
-//        validateProcessMembersListNotLong(membersToUpdate);
-//
-//        List<GroupMember> groupMembers = getMembersByGroupId(group.getId());
-//        Map<Long, User> members = groupMembers.stream()
-//                .map(GroupMember::getMember)
-//                .collect(Collectors.toMap(User::getId, user -> user));
-//
-//        for (MemberUpdateDto memberUpdate : membersToUpdate) {
-//            if (members.containsKey(memberUpdate.getId())) {
-//                User member = members.get(memberUpdate.getId());
-//                updateMemberFields(member,  memberUpdate);
-//            } else {
-//                throw new EntityNotFoundException(
-//                        String.format("User Not Found. User with ID %d not found in the group.", memberUpdate.getId()),
-//                        User.class
-//                );
-//            }
-//        }
-//    }
-
     private void updateMemberFields(User member, GroupMember groupMember, CurrentMemberInputDto memberUpdate) {
         validateBeforeUpdateMemberNotRegistered(member);
 
@@ -364,11 +327,10 @@ public class GroupServiceImpl implements GroupService {
             member.setName(memberUpdate.getName());
         }
         if (memberUpdate.getEmail() != null) {
-            if (splittValidator.isEmpty(memberUpdate.getEmail())) {
-                member.setEmail(null);
-            } else {
-                member.setEmail(memberUpdate.getEmail());
-            }
+            String email = splittValidator.isEmpty(memberUpdate.getEmail())
+                    ? null
+                    : memberUpdate.getEmail();
+            member.setEmail(email);
         }
         groupMember.setMember(member);
     }
@@ -397,13 +359,6 @@ public class GroupServiceImpl implements GroupService {
 
     private void validateBeforeUpdateMembers(GroupUpdateMembersDto dto) {
         dto.validateMembersListsNotEmpty();
-
-//        List<MemberUpdateDto> allMembersToProcess = dto.getNewMembers() != null
-//                ? dto.getNewMembers()
-//                : new ArrayList<>();
-//        if (dto.getCurrentMembers() != null) {
-//            allMembersToProcess.addAll(dto.getCurrentMembers());
-//        }
 
         List<MemberInputDto> allMembersToProcess = new ArrayList<>();
 
@@ -457,11 +412,6 @@ public class GroupServiceImpl implements GroupService {
     }
 
     private void validateBeforeUpdateMembersNamesNotBlank(List<? extends MemberInputDto> membersToProcess) {
-//        List<MemberInputDto> updateDtos = dto.getNewMembers() != null ? dto.getNewMembers() : new ArrayList<>();
-//        if (dto.getCurrentMembers() != null) {
-//            updateDtos.addAll(dto.getCurrentMembers());
-//        }
-
         List<String> blankNames = membersToProcess.stream()
                 .map(MemberInputDto::getName)
                 .filter(splittValidator.isBlankString())

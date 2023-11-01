@@ -3,7 +3,6 @@ package com.example.splitt.group.mapper;
 import com.example.splitt.group.dto.GroupOutputDto;
 import com.example.splitt.group.model.Group;
 import com.example.splitt.user.dto.UserOutputDto;
-import com.example.splitt.user.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

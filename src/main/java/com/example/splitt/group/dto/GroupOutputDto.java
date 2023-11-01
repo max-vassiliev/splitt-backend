@@ -1,7 +1,11 @@
 package com.example.splitt.group.dto;
 
 import com.example.splitt.user.dto.UserOutputDto;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.util.List;
 

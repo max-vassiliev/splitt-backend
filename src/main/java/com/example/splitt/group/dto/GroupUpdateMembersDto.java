@@ -3,7 +3,11 @@ package com.example.splitt.group.dto;
 import com.example.splitt.error.exception.CustomValidationException;
 import com.example.splitt.group.dto.member.CurrentMemberInputDto;
 import com.example.splitt.group.dto.member.NewMemberInputDto;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.util.List;
 
@@ -20,7 +24,6 @@ public class GroupUpdateMembersDto {
 
     private List<CurrentMemberInputDto> currentMembers;
 
-//    private List<MemberInputDto> newMembers;
     private List<NewMemberInputDto> newMembers;
 
     public void validateMembersListsNotEmpty() {
