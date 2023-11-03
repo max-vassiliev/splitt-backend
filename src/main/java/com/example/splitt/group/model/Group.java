@@ -1,7 +1,7 @@
 package com.example.splitt.group.model;
 
-import com.example.splitt.bill.Bill;
-import com.example.splitt.bill.Transaction;
+import com.example.splitt.bill.model.Bill;
+import com.example.splitt.bill.model.Transaction;
 import com.example.splitt.user.model.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

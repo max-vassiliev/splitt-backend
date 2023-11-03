@@ -1,4 +1,4 @@
-package com.example.splitt.bill;
+package com.example.splitt.bill.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

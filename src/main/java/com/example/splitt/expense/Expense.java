@@ -1,6 +1,6 @@
 package com.example.splitt.expense;
 
-import com.example.splitt.bill.Transaction;
+import com.example.splitt.bill.model.Transaction;
 import com.example.splitt.user.model.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
