@@ -11,7 +11,7 @@ import java.io.Serializable;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class BillPaymentId implements Serializable {
+public class BillPayerId implements Serializable {
 
     private Long bill;
 

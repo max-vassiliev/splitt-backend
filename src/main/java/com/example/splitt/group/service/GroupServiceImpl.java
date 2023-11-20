@@ -69,14 +69,6 @@ public class GroupServiceImpl implements GroupService {
         return groupMapper.toGroupOutputDto(group);
     }
 
-    private void populateGroup(Group group, List<GroupMember> groupMembers) {
-        Set<User> members = groupMembers.stream()
-                .map(GroupMember::getMember)
-                .collect(Collectors.toCollection(LinkedHashSet::new));
-        group.setMembers(members);
-    }
-
-
     @Override
     public List<GroupOutputShortDto> findAllByUserId(Long userId) {
         getUserById(userId);
@@ -201,6 +193,13 @@ public class GroupServiceImpl implements GroupService {
     // ------------------
     // Auxiliary Methods
     // ------------------
+
+    private void populateGroup(Group group, List<GroupMember> groupMembers) {
+        Set<User> members = groupMembers.stream()
+                .map(GroupMember::getMember)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+        group.setMembers(members);
+    }
 
     private List<User> processGroupMembers(List<NewMemberInputDto> memberDtos) {
         if (memberDtos == null || memberDtos.isEmpty()) {

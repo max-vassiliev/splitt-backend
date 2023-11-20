@@ -41,7 +41,7 @@ public class Bill {
     private User addedBy;
 
     @Transient
-    private Set<BillPayment> paidBy;
+    private Set<BillPayer> paidBy;
 
     @Column(name = "title", nullable = false)
     private String title;

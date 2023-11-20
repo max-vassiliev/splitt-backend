@@ -1,7 +1,8 @@
 package com.example.splitt.bill.model;
 
-public enum BillType {
+public enum TransactionType {
 
+    DEBT,
     EXPENSE,
     REPAYMENT
 

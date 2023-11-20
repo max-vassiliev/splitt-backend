@@ -18,12 +18,12 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "bills_paid_by", schema = "public")
-@IdClass(BillPaymentId.class)
+@IdClass(BillPayerId.class)
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class BillPayment {
+public class BillPayer {
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
@@ -42,7 +42,7 @@ public class BillPayment {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        BillPayment that = (BillPayment) o;
+        BillPayer that = (BillPayer) o;
         return Objects.equals(bill.getId(), that.bill.getId()) && Objects.equals(payer, that.payer);
     }
 
