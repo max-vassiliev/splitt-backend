@@ -41,7 +41,7 @@ create table if not exists bills
     title      varchar(50) not null,
     amount     integer not null,
     note       varchar (250) not null,
-    date       timestamp without time zone not null,
+    date       date not null,
     added_on   timestamp without time zone not null,
     constraint bills_pk
         primary key (id),

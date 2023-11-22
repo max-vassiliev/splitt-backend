@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Transactional(readOnly = true)
@@ -61,12 +62,24 @@ public class ExpenseServiceImpl implements ExpenseService {
         GroupMember groupRequester = getGroupMemberById(groupRequesterId);
         List<GroupMember> groupMembers = getMembersByGroupId(expenseDto.getGroupId());
 
-        // 
+        // ВАЛИДАЦИЯ
+        // Проверить, что все ID в DTO есть среди членов группы
+        validateGroupMembers(groupMembers, expenseDto);
 
+        // ЛОГИКА
 
+        // Создать счет
+        // Сохранить счет в БД — получить ID
+
+        // Создать транзакции
+        // Сохранить транзакции в БД — получить ID
 
         //
         return null;
+    }
+
+    private void validateGroupMembers(List<GroupMember> groupMembers, ExpenseCreateDto expenseDto) {
+//        Set<Long> dtoIds =
     }
 
 
