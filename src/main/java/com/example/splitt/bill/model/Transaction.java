@@ -28,6 +28,10 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "tr_type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private TransactionType type;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_id")
     private Group group;
@@ -46,9 +50,5 @@ public class Transaction {
 
     @Column(name = "amount", nullable = false)
     private int amount;
-
-    @Column(name = "tr_type", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private TransactionType type;
 
 }

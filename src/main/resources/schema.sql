@@ -49,20 +49,20 @@ create table if not exists bills
         foreign key (added_by) references users (id)
 );
 
-create table if not exists bills_paid_by
-(
-    bill_id    bigint not null,
-    payer_id   bigint not null,
-    amount     integer not null,
-    constraint bills_paid_by_pk
-        primary key (bill_id, payer_id),
-    constraint bills_paid_by_bill_id_fk
-        foreign key (bill_id) references bills (id),
-    constraint bills_paid_by_payer_id_fk
-        foreign key (payer_id) references users (id),
-    constraint unique_bill_payer
-        unique (bill_id, payer_id)
-);
+-- create table if not exists bills_paid_by
+-- (
+--     bill_id    bigint not null,
+--     payer_id   bigint not null,
+--     amount     integer not null,
+--     constraint bills_paid_by_pk
+--         primary key (bill_id, payer_id),
+--     constraint bills_paid_by_bill_id_fk
+--         foreign key (bill_id) references bills (id),
+--     constraint bills_paid_by_payer_id_fk
+--         foreign key (payer_id) references users (id),
+--     constraint unique_bill_payer
+--         unique (bill_id, payer_id)
+-- );
 
 create table if not exists transactions
 (

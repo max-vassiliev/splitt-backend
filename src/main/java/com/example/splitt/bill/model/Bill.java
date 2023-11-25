@@ -1,5 +1,6 @@
 package com.example.splitt.bill.model;
 
+import com.example.splitt.bill.dto.ExpenseCreateDto;
 import com.example.splitt.user.model.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -17,7 +18,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -40,9 +43,6 @@ public class Bill {
     @JoinColumn(name = "added_by", nullable = false)
     private User addedBy;
 
-    @Transient
-    private Set<BillPayer> paidBy;
-
     @Column(name = "title", nullable = false)
     private String title;
 
@@ -53,13 +53,17 @@ public class Bill {
     private String note;
 
     @Column(name = "date", nullable = false)
-    private LocalDateTime date;
+    private LocalDate date;
+//    private LocalDateTime date;
 
     @Column(name = "added_on", nullable = false)
     private LocalDateTime addedOn;
 
     @Transient
-    private Set<Transaction> transactions;
+    private List<Transaction> payments;
+
+    @Transient
+    private List<Transaction> debts;
 
     @Override
     public boolean equals(Object o) {

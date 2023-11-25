@@ -1,5 +1,6 @@
 package com.example.splitt.bill.dto;
 
+import com.example.splitt.user.dto.UserOutShortDto;
 import lombok.*;
 
 import java.util.List;
@@ -15,11 +16,19 @@ public class ExpenseBalanceOutDto {
 
     private String title;
 
+    private String note;
+
     private float amount;
+
+    private String date;
+
+    private UserOutShortDto addedBy;
+
+    private String addedOn;
 
     List<UserSplitOutDto> paidBy;
 
-    List<UserDebtOutDto> shares;
+    List<UserSplitOutDto> debtShares;
 
     List<GroupBalanceOutDto> groupBalance;
 

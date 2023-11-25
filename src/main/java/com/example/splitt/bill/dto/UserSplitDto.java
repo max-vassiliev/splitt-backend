@@ -14,7 +14,7 @@ import lombok.ToString;
 @ToString
 public class UserSplitDto {
 
-    @NotBlank(message = "User ID Not Present. Please add User Id.")
+    @NotBlank(message = "User ID Not Present. Please add User ID.")
     private Long userId;
 
     @NotBlank(message = "Amount Not Present. Please add amount.")
