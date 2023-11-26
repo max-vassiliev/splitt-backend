@@ -24,6 +24,12 @@ public class BillMapper {
     }
 
     public ExpenseBalanceOutDto toExpenseBalanceOutDto(Bill bill) {
+
+        // отдельно:
+        // private UserOutShortDto addedBy;
+        // List<UserSplitOutDto> paidBy;
+        // List<UserSplitOutDto> debtShares;
+        // List<GroupBalanceOutDto> groupBalance;
         return null;
     }
 }

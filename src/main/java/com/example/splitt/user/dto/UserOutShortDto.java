@@ -14,6 +14,7 @@ import lombok.ToString;
 public class UserOutShortDto {
 
     private Long id;
+
     private String name;
 
 }
