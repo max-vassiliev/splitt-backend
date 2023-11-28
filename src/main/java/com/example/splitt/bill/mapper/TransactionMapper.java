@@ -30,7 +30,7 @@ public class TransactionMapper {
         for (UserSplitDto userSplitDto : userShares) {
             Transaction transaction = new Transaction();
             transaction.setUser(groupMembers.get(userSplitDto.getUserId()));
-            transaction.setAmount(convertAmount(userSplitDto.getSplitAmount()));
+            transaction.setAmount(convertAmount(userSplitDto.getAmount()));
             transaction.setType(transactionType);
             transaction.setGroup(group);
             transaction.setBill(bill);
@@ -41,6 +41,6 @@ public class TransactionMapper {
     }
 
     private int convertAmount(float amountDto) {
-        return (int) amountDto * AMOUNT_CONVERSION_FACTOR;
+        return (int) (amountDto * AMOUNT_CONVERSION_FACTOR);
     }
 }

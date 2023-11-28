@@ -27,10 +27,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,8 +38,6 @@ import java.util.stream.Collectors;
 public class ExpenseServiceImpl implements ExpenseService {
 
     private static final int AMOUNT_CONVERSION_FACTOR = 100;
-
-    private static final String SPLITT_DATE_FORMAT = "yyyy-MM-dd";
 
     private final BillRepository billRepository;
 
@@ -63,64 +60,45 @@ public class ExpenseServiceImpl implements ExpenseService {
     @Override
     @Transactional
     public ExpenseBalanceOutDto add(ExpenseCreateDto expenseDto) {
+
+        // Validate and retrieve data
+
         validateBeforeAdd(expenseDto);
 
-        // БД + ВАЛИДАЦИЯ
-        // 1) получить requester;
-        // 2) получить группу;
-        // 3) получить членов группы (GroupMember) — по ID группы и пользователей;
-        //    так проверяем, что пользователи состоят в группе
-
         User requester = getUserById(expenseDto.getRequesterId());
+        validateRequesterIsRegistered(requester);
         GroupMemberId groupRequesterId = new GroupMemberId(expenseDto.getRequesterId(),
                 expenseDto.getGroupId());
         GroupMember groupRequester = getGroupMemberById(groupRequesterId);
         Group group = groupRequester.getGroup();
         List<GroupMember> groupMembers = getMembersByGroupId(expenseDto.getGroupId());
 
-        // Проверить, что все ID в DTO есть среди членов группы
         validateGroupMembers(groupMembers, expenseDto);
 
-        // ЛОГИКА
+        // Save data
 
-        // Создать счет
-        // Сохранить счет в БД — получить ID
-//        Bill billToSave = buildExpenseBill(expenseDto, requester);
         Bill billToSave = billMapper.toExpenseBill(expenseDto, requester);
         Bill bill = billRepository.save(billToSave);
 
-        Map<Long, User> members = toMembersMap(groupMembers);
+        Map<Long, User> members = groupMembers.stream()
+                .collect(Collectors.toMap(groupMember -> groupMember.getMember().getId(),
+                        GroupMember::getMember));
 
         List<Transaction> paymentsToSave = transactionMapper.toTransactions(TransactionType.PAYMENT,
                 expenseDto.getPaidBy(), group, bill, members);
         List<Transaction> debtsToSave = transactionMapper.toTransactions(TransactionType.DEBT,
                 expenseDto.getDebtShares(), group, bill, members);
 
-//        List<Transaction> paymentsToSave = buildTransactions(TransactionType.PAYMENT,
-//                expenseDto.getPaidBy(), group, bill, members);
-//                List<Transaction> debtsToSave = buildTransactions(TransactionType.DEBT,
-//                expenseDto.getDebtShares(), group, bill, members);
-
         List<Transaction> payments = transactionRepository.saveAll(paymentsToSave);
         List<Transaction> debts = transactionRepository.saveAll(debtsToSave);
+
+        // Prepare for output
 
         bill.setPayments(payments);
         bill.setDebts(debts);
 
-        // TODO подготовить к выходу
-
-
-        return null;
+        return billMapper.toExpenseBalanceOutDto(bill);
     }
-
-
-
-
-
-
-
-
-
 
     // -------------
     // Repository
@@ -137,7 +115,7 @@ public class ExpenseServiceImpl implements ExpenseService {
     private GroupMember getGroupMemberById(GroupMemberId searchId) {
         return groupMemberRepository.findById(searchId)
                 .orElseThrow(() -> new EntityNotFoundException(
-                        String.format("Group Not Found. May be one of the following: " +
+                        String.format("Group or User Not Found. May be one of the following: " +
                                         "a) group with ID=%d does not exist; " +
                                         "b) user with ID=%d does not exist " +
                                         "or does not have access to the group",
@@ -155,45 +133,39 @@ public class ExpenseServiceImpl implements ExpenseService {
     // Auxiliary Methods
     // ------------------
 
-    private int convertAmount(float amountDto) {
-        return (int) amountDto * AMOUNT_CONVERSION_FACTOR;
-    }
-
-    private Map<Long, User> toMembersMap(List<GroupMember> groupMembers) {
-        return groupMembers.stream()
-                .collect(Collectors.toMap(groupMember -> groupMember.getMember().getId(),
-                        GroupMember::getMember));
-    }
 
     // -------------
     // Validation
     // -------------
 
     private void validateBeforeAdd(ExpenseCreateDto expenseDto) {
-        validateTitleNotEmpty(expenseDto.getTitle());
+        if (splittValidator.isEmpty(expenseDto.getNote())) {
+            expenseDto.setNote(null);
+        }
         expenseDto.validatePaidByNotEmpty();
         expenseDto.validateDebtSharesNotEmpty();
         validateExpenseAmount(expenseDto.getAmount(), expenseDto.getPaidBy(), "paidBy");
         validateExpenseAmount(expenseDto.getAmount(), expenseDto.getDebtShares(), "debtShares");
     }
 
-    private void validateTitleNotEmpty(String title) {
-        if (splittValidator.isEmpty(title)) {
-            throw new CustomValidationException("Expense Title Empty. Please add title.");
-        }
-    }
-
     private void validateExpenseAmount(float expenseAmount, List<UserSplitDto> shares, String fieldName) {
         if (!areSharesAddingUp(expenseAmount, shares)) {
             throw new CustomValidationException(String.format("Shares Not Adding Up. " +
-                    "Please review shares in the field %s", fieldName));
+                    "Please review shares in the field '%s'.", fieldName));
+        }
+    }
+
+    private void validateRequesterIsRegistered(User requester) {
+        if (!splittValidator.isUserRegistered(requester)) {
+            throw new CustomValidationException("User Not Registered. " +
+                    "Only registered users can manage expenses.");
         }
     }
 
     private boolean areSharesAddingUp(float amount, List<UserSplitDto> userSplitDtos) {
-        int totalAmountExpected = (int) amount * AMOUNT_CONVERSION_FACTOR;
+        int totalAmountExpected = (int) (amount * AMOUNT_CONVERSION_FACTOR);
         int totalAmount = userSplitDtos.stream()
-                .map(dto -> (int) (dto.getSplitAmount() * AMOUNT_CONVERSION_FACTOR))
+                .map(dto -> (int) (dto.getAmount() * AMOUNT_CONVERSION_FACTOR))
                 .reduce(0, Integer::sum);
 
         return totalAmount == totalAmountExpected;
@@ -220,41 +192,5 @@ public class ExpenseServiceImpl implements ExpenseService {
             throw new CustomValidationException("Invalid User IDs. " +
                     "No members in the group with the following IDs: " + missingUserIds);
         }
-    }
-
-
-    // TODO удалить, если не понадобится
-    private List<Transaction> buildTransactions(TransactionType transactionType,
-                                                List<UserSplitDto> userShares,
-                                                Group group,
-                                                Bill bill,
-                                                Map<Long, User> groupMembers) {
-        List<Transaction> transactions = new ArrayList<>();
-
-        for (UserSplitDto userSplitDto : userShares) {
-            Transaction transaction = new Transaction();
-            transaction.setUser(groupMembers.get(userSplitDto.getUserId()));
-            transaction.setAmount(convertAmount(userSplitDto.getSplitAmount()));
-            transaction.setType(transactionType);
-            transaction.setGroup(group);
-            transaction.setBill(bill);
-            transactions.add(transaction);
-        }
-
-        return transactions;
-    }
-
-    // TODO удалить, если не надо
-    private Bill buildExpenseBill(ExpenseCreateDto expenseDto, User requester) {
-        Bill bill = new Bill();
-        bill.setType(BillType.EXPENSE);
-        bill.setAddedBy(requester);                                 // TODO отдельно
-        bill.setTitle(expenseDto.getTitle());
-        bill.setAmount(convertAmount(expenseDto.getAmount()));
-        bill.setNote(expenseDto.getNote());
-        bill.setDate(LocalDate.parse(expenseDto.getDate(),
-                DateTimeFormatter.ofPattern(SPLITT_DATE_FORMAT)));
-        bill.setAddedOn(LocalDateTime.now());                       // TODO отдельно
-        return bill;
     }
 }

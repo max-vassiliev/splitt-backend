@@ -1,6 +1,5 @@
 package com.example.splitt.bill.model;
 
-import com.example.splitt.bill.dto.ExpenseCreateDto;
 import com.example.splitt.user.model.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -22,7 +21,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 @Entity
 @Table(name = "bills", schema = "public")
@@ -54,7 +52,6 @@ public class Bill {
 
     @Column(name = "date", nullable = false)
     private LocalDate date;
-//    private LocalDateTime date;
 
     @Column(name = "added_on", nullable = false)
     private LocalDateTime addedOn;

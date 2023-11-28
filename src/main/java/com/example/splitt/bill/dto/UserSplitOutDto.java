@@ -11,8 +11,8 @@ public class UserSplitOutDto extends UserSplitDto {
 
     private String userName;
 
-    public UserSplitOutDto(Long userId, String userName, Float amountPaid) {
-        super(userId, amountPaid);
+    public UserSplitOutDto(Long userId, String userName, Float amount) {
+        super(userId, amount);
         this.userName = userName;
     }
 }

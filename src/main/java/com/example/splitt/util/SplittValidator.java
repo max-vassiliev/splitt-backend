@@ -1,5 +1,6 @@
 package com.example.splitt.util;
 
+import com.example.splitt.user.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -29,5 +30,8 @@ public class SplittValidator {
         return str -> str != null && str.trim().isEmpty();
     }
 
+    public boolean isUserRegistered(User user) {
+        return user.getEmail() != null && user.getPassword() != null;
+    }
 
 }

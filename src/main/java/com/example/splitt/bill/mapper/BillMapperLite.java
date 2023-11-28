@@ -14,7 +14,7 @@ public interface BillMapperLite {
 
     String SPLITT_DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
-    @Mapping(target = "type", expression = "java(BillType.EXPENSE)")
+//    @Mapping(target = "type", expression = "java(BillType.EXPENSE)")
     @Mapping(target = "amount", source = "amount", qualifiedByName = "amountToInt")
     @Mapping(target = "date", source = "date", dateFormat = SPLITT_DATE_FORMAT)
     Bill toExpenseBill(ExpenseCreateDto expenseDto);
@@ -32,7 +32,7 @@ public interface BillMapperLite {
 
     @Named("amountToInt")
     static float mapAmountToFloat(int amount) {
-        return (float) (amount / 100);
+        return (float) amount / 100;
     }
 
 }

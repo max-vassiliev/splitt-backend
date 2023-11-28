@@ -389,7 +389,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     private void validateRequesterIsRegistered(User requester) {
-        if (!isUserRegistered(requester)) {
+        if (!splittValidator.isUserRegistered(requester)) {
             throw new CustomValidationException("User Not Registered. " +
                     "Only registered users can manage groups.");
         }
@@ -403,7 +403,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     private void validateBeforeUpdateMemberNotRegistered(User member) {
-        if (isUserRegistered(member)) {
+        if (splittValidator.isUserRegistered(member)) {
             throw new CustomValidationException(String.format("User Data Cannot Be Changed. " +
                             "User %d is a registered user. Other users cannot update their data.",
                     member.getId()));
@@ -438,6 +438,7 @@ public class GroupServiceImpl implements GroupService {
         }
     }
 
+    // TODO удалить
     private boolean isUserRegistered(User user) {
         return user.getEmail() != null && user.getPassword() != null;
     }

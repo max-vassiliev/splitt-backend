@@ -10,9 +10,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingPathVariableException;
+import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -50,6 +53,40 @@ public class ErrorHandler {
         return new ApiError(HttpStatus.BAD_REQUEST,
                 "Incorrectly made request.",
                 "Request Body Missing",
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern(SPLITT_DATE_TIME_FORMAT))
+        );
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handleMissingRequestHeaderException(final MissingRequestHeaderException exception) {
+        log.warn("400 - Bad Request: {}", exception.getMessage());
+        return new ApiError(HttpStatus.BAD_REQUEST,
+                "Incorrectly made request.",
+                exception.getBody().getDetail(),
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern(SPLITT_DATE_TIME_FORMAT))
+        );
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handleMethodArgumentTypeMismatchException(final MethodArgumentTypeMismatchException exception) {
+        log.warn("400 - Bad Request: {}", exception.getMessage());
+        return new ApiError(HttpStatus.BAD_REQUEST,
+                "Incorrectly made request.",
+                String.format("Incorrect input for parameter '%s'. Received input: %s",
+                        exception.getName(), exception.getValue()),
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern(SPLITT_DATE_TIME_FORMAT))
+        );
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handleMissingPathVariableException(final MissingPathVariableException exception) {
+        log.warn("400 - Bad Request: {}", exception.getMessage());
+        return new ApiError(HttpStatus.BAD_REQUEST,
+                "Incorrectly made request.",
+                "Missing path variable.",
                 LocalDateTime.now().format(DateTimeFormatter.ofPattern(SPLITT_DATE_TIME_FORMAT))
         );
     }

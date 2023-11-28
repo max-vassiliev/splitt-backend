@@ -40,7 +40,7 @@ create table if not exists bills
     added_by   bigint  not null,
     title      varchar(50) not null,
     amount     integer not null,
-    note       varchar (250) not null,
+    note       varchar (250),
     date       date not null,
     added_on   timestamp without time zone not null,
     constraint bills_pk
