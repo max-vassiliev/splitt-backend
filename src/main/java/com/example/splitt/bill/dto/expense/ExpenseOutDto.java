@@ -1,5 +1,7 @@
-package com.example.splitt.bill.dto;
+package com.example.splitt.bill.dto.expense;
 
+import com.example.splitt.bill.dto.GroupBalanceOutDto;
+import com.example.splitt.bill.dto.shares.UserSplitOutDto;
 import com.example.splitt.user.dto.UserOutShortDto;
 import lombok.*;
 
@@ -10,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class ExpenseBalanceOutDto {
+public class ExpenseOutDto {
 
     private Long id;
 

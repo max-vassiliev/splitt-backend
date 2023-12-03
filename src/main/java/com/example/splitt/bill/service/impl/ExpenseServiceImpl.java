@@ -1,17 +1,17 @@
-package com.example.splitt.bill.service;
+package com.example.splitt.bill.service.impl;
 
-import com.example.splitt.bill.dto.ExpenseBalanceOutDto;
-import com.example.splitt.bill.dto.ExpenseCreateDto;
-import com.example.splitt.bill.dto.UserSplitDto;
+import com.example.splitt.bill.dto.expense.ExpenseOutDto;
+import com.example.splitt.bill.dto.expense.ExpenseCreateDto;
+import com.example.splitt.bill.dto.shares.UserSplitDto;
 import com.example.splitt.bill.mapper.BillMapper;
 import com.example.splitt.bill.mapper.TransactionMapper;
-import com.example.splitt.bill.model.Bill;
-import com.example.splitt.bill.model.BillType;
-import com.example.splitt.bill.model.Transaction;
-import com.example.splitt.bill.model.TransactionType;
+import com.example.splitt.bill.model.bill.Bill;
+import com.example.splitt.bill.model.transaction.Transaction;
+import com.example.splitt.bill.model.transaction.TransactionType;
 import com.example.splitt.bill.repository.BillPaymentRepository;
 import com.example.splitt.bill.repository.BillRepository;
 import com.example.splitt.bill.repository.TransactionRepository;
+import com.example.splitt.bill.service.ExpenseService;
 import com.example.splitt.error.exception.CustomValidationException;
 import com.example.splitt.error.exception.EntityNotFoundException;
 import com.example.splitt.group.model.Group;
@@ -59,25 +59,23 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Override
     @Transactional
-    public ExpenseBalanceOutDto add(ExpenseCreateDto expenseDto) {
+    public ExpenseOutDto add(ExpenseCreateDto dto) {
 
         // Validate and retrieve data
 
-        validateBeforeAdd(expenseDto);
+        validateBeforeAdd(dto);
 
-        User requester = getUserById(expenseDto.getRequesterId());
+        User requester = getUserById(dto.getRequesterId());
         validateRequesterIsRegistered(requester);
-        GroupMemberId groupRequesterId = new GroupMemberId(expenseDto.getRequesterId(),
-                expenseDto.getGroupId());
-        GroupMember groupRequester = getGroupMemberById(groupRequesterId);
-        Group group = groupRequester.getGroup();
-        List<GroupMember> groupMembers = getMembersByGroupId(expenseDto.getGroupId());
 
-        validateGroupMembers(groupMembers, expenseDto);
+        GroupMember groupRequester = getGroupMember(dto.getGroupId(), dto.getRequesterId());
+        Group group = groupRequester.getGroup();
+        List<GroupMember> groupMembers = getMembersByGroupId(dto.getGroupId());
+        validateGroupMembers(groupMembers, dto);
 
         // Save data
 
-        Bill billToSave = billMapper.toExpenseBill(expenseDto, requester);
+        Bill billToSave = billMapper.toExpenseBill(dto, requester);
         Bill bill = billRepository.save(billToSave);
 
         Map<Long, User> members = groupMembers.stream()
@@ -85,9 +83,9 @@ public class ExpenseServiceImpl implements ExpenseService {
                         GroupMember::getMember));
 
         List<Transaction> paymentsToSave = transactionMapper.toTransactions(TransactionType.PAYMENT,
-                expenseDto.getPaidBy(), group, bill, members);
+                dto.getPaidBy(), group, bill, members);
         List<Transaction> debtsToSave = transactionMapper.toTransactions(TransactionType.DEBT,
-                expenseDto.getDebtShares(), group, bill, members);
+                dto.getDebtShares(), group, bill, members);
 
         List<Transaction> payments = transactionRepository.saveAll(paymentsToSave);
         List<Transaction> debts = transactionRepository.saveAll(debtsToSave);
@@ -97,7 +95,7 @@ public class ExpenseServiceImpl implements ExpenseService {
         bill.setPayments(payments);
         bill.setDebts(debts);
 
-        return billMapper.toExpenseBalanceOutDto(bill);
+        return billMapper.toExpenseOutDto(bill);
     }
 
     // -------------
@@ -112,7 +110,8 @@ public class ExpenseServiceImpl implements ExpenseService {
                 ));
     }
 
-    private GroupMember getGroupMemberById(GroupMemberId searchId) {
+    private GroupMember getGroupMember(Long groupId, Long userId) {
+        GroupMemberId searchId = new GroupMemberId(groupId, userId);
         return groupMemberRepository.findById(searchId)
                 .orElseThrow(() -> new EntityNotFoundException(
                         String.format("Group or User Not Found. May be one of the following: " +
@@ -139,9 +138,6 @@ public class ExpenseServiceImpl implements ExpenseService {
     // -------------
 
     private void validateBeforeAdd(ExpenseCreateDto expenseDto) {
-        if (splittValidator.isEmpty(expenseDto.getNote())) {
-            expenseDto.setNote(null);
-        }
         expenseDto.validatePaidByNotEmpty();
         expenseDto.validateDebtSharesNotEmpty();
         validateExpenseAmount(expenseDto.getAmount(), expenseDto.getPaidBy(), "paidBy");

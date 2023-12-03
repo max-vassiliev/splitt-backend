@@ -1,6 +1,5 @@
-package com.example.splitt.bill.dto;
+package com.example.splitt.bill.dto.shares;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

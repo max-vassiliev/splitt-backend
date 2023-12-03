@@ -1,8 +1,9 @@
 package com.example.splitt.bill.mapper;
 
-import com.example.splitt.bill.dto.ExpenseBalanceOutDto;
-import com.example.splitt.bill.dto.ExpenseCreateDto;
-import com.example.splitt.bill.model.Bill;
+import com.example.splitt.bill.dto.expense.ExpenseOutDto;
+import com.example.splitt.bill.dto.expense.ExpenseCreateDto;
+import com.example.splitt.bill.dto.repayment.RepaymentCreateDto;
+import com.example.splitt.bill.model.bill.Bill;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -19,11 +20,15 @@ public interface BillMapperLite {
     @Mapping(target = "date", source = "date", dateFormat = SPLITT_DATE_FORMAT)
     Bill toExpenseBill(ExpenseCreateDto expenseDto);
 
+    @Mapping(target = "amount", source = "amount", qualifiedByName = "amountToInt")
+    @Mapping(target = "date", source = "date", dateFormat = SPLITT_DATE_FORMAT)
+    Bill toRepaymentBill(RepaymentCreateDto dto);
+
     @Mapping(target = "addedBy", ignore = true)
     @Mapping(target = "amount", source = "amount", qualifiedByName = "amountToInt")
     @Mapping(target = "date", source = "date", dateFormat = SPLITT_DATE_FORMAT)
     @Mapping(target = "addedOn", source = "addedOn", dateFormat = SPLITT_DATE_TIME_FORMAT)
-    ExpenseBalanceOutDto toExpenseBalanceOutDto(Bill bill);
+    ExpenseOutDto toExpenseBalanceOutDto(Bill bill);
 
     @Named("amountToInt")
     static int mapAmountToInt(Float amount) {

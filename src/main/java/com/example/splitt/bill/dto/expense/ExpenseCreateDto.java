@@ -1,5 +1,6 @@
-package com.example.splitt.bill.dto;
+package com.example.splitt.bill.dto.expense;
 
+import com.example.splitt.bill.dto.shares.UserSplitDto;
 import com.example.splitt.error.exception.CustomValidationException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -21,7 +22,7 @@ public class ExpenseCreateDto {
 
     private Long groupId;
 
-    @NotBlank(message = "Expense Title Absent. Please add title.")
+    @NotBlank(message = "Title Absent. Please add title.")
     @Size(max = 50, message = "Title Size Exceeded. The title most not exceed 50 characters.")
     private String title;
 
@@ -33,7 +34,7 @@ public class ExpenseCreateDto {
 
     @NotBlank(message = "Expense Date Missing. Please add the date the expense was made.")
     @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}",
-            message = "Date Format Error. Date must be in the format 'yyyy-MM-dd'.")
+            message = "Date Format Error. The date must be written in the following format: 'yyyy-MM-dd'.")
     private String date;
 
     @Valid

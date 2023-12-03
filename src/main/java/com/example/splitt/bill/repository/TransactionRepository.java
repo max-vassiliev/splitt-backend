@@ -1,6 +1,6 @@
 package com.example.splitt.bill.repository;
 
-import com.example.splitt.bill.model.Transaction;
+import com.example.splitt.bill.model.transaction.Transaction;
 import com.example.splitt.bill.model.UserBalance;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

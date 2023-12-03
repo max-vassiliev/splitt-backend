@@ -1,9 +1,9 @@
 package com.example.splitt.bill.service;
 
-import com.example.splitt.bill.dto.ExpenseBalanceOutDto;
-import com.example.splitt.bill.dto.ExpenseCreateDto;
+import com.example.splitt.bill.dto.expense.ExpenseOutDto;
+import com.example.splitt.bill.dto.expense.ExpenseCreateDto;
 
 public interface ExpenseService {
-    ExpenseBalanceOutDto add(ExpenseCreateDto expenseDto);
+    ExpenseOutDto add(ExpenseCreateDto expenseDto);
 
 }

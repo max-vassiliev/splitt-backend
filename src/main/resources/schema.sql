@@ -70,7 +70,7 @@ create table if not exists transactions
     group_id     bigint  not null,
     bill_id      bigint  not null,
     user_id      bigint  not null,
-    receiver_id  bigint,
+    recipient_id  bigint,
     amount       integer not null,
     tr_type      varchar (11) not null,
     constraint transactions_pk
@@ -78,7 +78,7 @@ create table if not exists transactions
     constraint transactions_user_id_fk
         foreign key (user_id) references users (id),
     constraint transactions_receiver_id_fk
-        foreign key (receiver_id) references users (id)
+        foreign key (recipient_id) references users (id)
             deferrable initially deferred,
     constraint transactions_group_id_fk
         foreign key (group_id) references groups (id),

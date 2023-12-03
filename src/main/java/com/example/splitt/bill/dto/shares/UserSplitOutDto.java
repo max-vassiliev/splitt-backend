@@ -1,4 +1,4 @@
-package com.example.splitt.bill.dto;
+package com.example.splitt.bill.dto.shares;
 
 import lombok.Getter;
 import lombok.Setter;

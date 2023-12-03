@@ -1,4 +1,4 @@
-package com.example.splitt.bill.model;
+package com.example.splitt.bill.model.bill;
 
 public enum BillType {
 

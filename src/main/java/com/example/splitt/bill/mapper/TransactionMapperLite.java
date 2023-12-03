@@ -1,7 +1,7 @@
 package com.example.splitt.bill.mapper;
 
-import com.example.splitt.bill.dto.UserSplitOutDto;
-import com.example.splitt.bill.model.Transaction;
+import com.example.splitt.bill.dto.shares.UserSplitOutDto;
+import com.example.splitt.bill.model.transaction.Transaction;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;

@@ -1,5 +1,6 @@
-package com.example.splitt.bill.model;
+package com.example.splitt.bill.model.transaction;
 
+import com.example.splitt.bill.model.bill.Bill;
 import com.example.splitt.group.model.Group;
 import com.example.splitt.user.model.User;
 import jakarta.persistence.Column;
@@ -45,8 +46,8 @@ public class Transaction {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "receiver_id")
-    private User receiver;
+    @JoinColumn(name = "recipient_id")
+    private User recipient;
 
     @Column(name = "amount", nullable = false)
     private int amount;

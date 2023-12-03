@@ -1,7 +1,7 @@
 package com.example.splitt.bill.controller;
 
-import com.example.splitt.bill.dto.ExpenseBalanceOutDto;
-import com.example.splitt.bill.dto.ExpenseCreateDto;
+import com.example.splitt.bill.dto.expense.ExpenseOutDto;
+import com.example.splitt.bill.dto.expense.ExpenseCreateDto;
 import com.example.splitt.bill.service.ExpenseService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,9 +27,9 @@ public class ExpenseController {
     private final ExpenseService expenseService;
 
     @PostMapping
-    public ExpenseBalanceOutDto add(@PathVariable(name = "groupId") Long groupId,
-                                    @RequestHeader(REQUESTER_ID_HEADER) Long requesterId,
-                                    @Valid @RequestBody ExpenseCreateDto expenseDto) {
+    public ExpenseOutDto add(@PathVariable(name = "groupId") Long groupId,
+                             @RequestHeader(REQUESTER_ID_HEADER) Long requesterId,
+                             @Valid @RequestBody ExpenseCreateDto expenseDto) {
         log.info("POST /groups/{}/expenses/ | X-Requester-User-Id: {} | Request Body: {}", groupId,
                 requesterId, expenseDto);
         expenseDto.setRequesterId(requesterId);

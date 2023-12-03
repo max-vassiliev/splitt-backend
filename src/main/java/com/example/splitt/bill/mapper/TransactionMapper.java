@@ -1,9 +1,9 @@
 package com.example.splitt.bill.mapper;
 
-import com.example.splitt.bill.dto.UserSplitDto;
-import com.example.splitt.bill.model.Bill;
-import com.example.splitt.bill.model.Transaction;
-import com.example.splitt.bill.model.TransactionType;
+import com.example.splitt.bill.dto.shares.UserSplitDto;
+import com.example.splitt.bill.model.bill.Bill;
+import com.example.splitt.bill.model.transaction.Transaction;
+import com.example.splitt.bill.model.transaction.TransactionType;
 import com.example.splitt.group.model.Group;
 import com.example.splitt.user.model.User;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +38,18 @@ public class TransactionMapper {
         }
 
         return transactions;
+    }
+
+    public Transaction toRepayment(User payer, User recipient, Group group,
+                                              Bill bill, int amount) {
+        Transaction repayment = new Transaction();
+        repayment.setType(TransactionType.REPAYMENT);
+        repayment.setGroup(group);
+        repayment.setBill(bill);
+        repayment.setUser(payer);
+        repayment.setRecipient(recipient);
+        repayment.setAmount(amount);
+        return  repayment;
     }
 
     private int convertAmount(float amountDto) {
