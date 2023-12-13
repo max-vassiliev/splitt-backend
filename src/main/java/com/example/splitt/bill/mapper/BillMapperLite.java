@@ -3,6 +3,7 @@ package com.example.splitt.bill.mapper;
 import com.example.splitt.bill.dto.expense.ExpenseOutDto;
 import com.example.splitt.bill.dto.expense.ExpenseCreateDto;
 import com.example.splitt.bill.dto.repayment.RepaymentCreateDto;
+import com.example.splitt.bill.dto.repayment.RepaymentOutDto;
 import com.example.splitt.bill.model.bill.Bill;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -14,6 +15,8 @@ public interface BillMapperLite {
     String SPLITT_DATE_FORMAT = "yyyy-MM-dd";
 
     String SPLITT_DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+
+    String REPAYMENT_DEFAULT_TITLE = "Repayment ##autotitle##";
 
 //    @Mapping(target = "type", expression = "java(BillType.EXPENSE)")
     @Mapping(target = "amount", source = "amount", qualifiedByName = "amountToInt")
@@ -28,7 +31,16 @@ public interface BillMapperLite {
     @Mapping(target = "amount", source = "amount", qualifiedByName = "amountToInt")
     @Mapping(target = "date", source = "date", dateFormat = SPLITT_DATE_FORMAT)
     @Mapping(target = "addedOn", source = "addedOn", dateFormat = SPLITT_DATE_TIME_FORMAT)
-    ExpenseOutDto toExpenseBalanceOutDto(Bill bill);
+    ExpenseOutDto toExpenseOutDto(Bill bill);
+
+    @Mapping(target = "addedBy", ignore = true)
+    @Mapping(target = "amount", source = "amount", qualifiedByName = "amountToInt")
+    @Mapping(target = "title", source = "title", qualifiedByName = "mapRepaymentTitle")
+    @Mapping(target = "date", source = "date", dateFormat = SPLITT_DATE_FORMAT)
+    @Mapping(target = "addedOn", source = "addedOn", dateFormat = SPLITT_DATE_TIME_FORMAT)
+    RepaymentOutDto toRepaymentOutDto(Bill bill);
+
+    // Auxiliary methods
 
     @Named("amountToInt")
     static int mapAmountToInt(Float amount) {
@@ -40,4 +52,11 @@ public interface BillMapperLite {
         return (float) amount / 100;
     }
 
+    @Named("mapRepaymentTitle")
+    default String mapRepaymentTitle(String title) {
+        if (REPAYMENT_DEFAULT_TITLE.equals(title)) {
+            return null;
+        }
+        return title;
+    }
 }

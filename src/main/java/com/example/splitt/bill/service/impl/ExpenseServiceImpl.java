@@ -2,7 +2,7 @@ package com.example.splitt.bill.service.impl;
 
 import com.example.splitt.bill.dto.expense.ExpenseOutDto;
 import com.example.splitt.bill.dto.expense.ExpenseCreateDto;
-import com.example.splitt.bill.dto.shares.UserSplitDto;
+import com.example.splitt.util.balance.dto.UserSplitDto;
 import com.example.splitt.bill.mapper.BillMapper;
 import com.example.splitt.bill.mapper.TransactionMapper;
 import com.example.splitt.bill.model.bill.Bill;

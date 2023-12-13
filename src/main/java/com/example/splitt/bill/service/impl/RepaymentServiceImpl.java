@@ -24,9 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -75,53 +73,11 @@ public class RepaymentServiceImpl implements RepaymentService {
         Transaction savedTransaction = transactionRepository.save(transactionToSave);
 
         // Prepare for output
+
         savedBill.setRepayment(savedTransaction);
 
-        // TODO написать маппер
-        return null;
+        return billMapper.toRepaymentOutDto(savedBill);
     }
-
-    private User extractRequesterBeforeAdd(List<GroupMember> groupMembers,
-                                           Long requesterId) {
-        User requester = extractUserFromGroupMembers(groupMembers, requesterId);
-        validateRequesterIsRegistered(requester);
-        return requester;
-    }
-
-    private void validatePayerAndRecipientBeforeAdd(List<GroupMember> groupMembers,
-                                                    RepaymentCreateDto dto) {
-        extractUserFromGroupMembers(groupMembers, dto.getPayerId());
-    }
-
-    private void validateRequesterBeforeAdd(List<GroupMember> groupMembers,
-                                            RepaymentCreateDto dto) {
-        User requester = extractUserFromGroupMembers(groupMembers, dto.getRequesterId());
-//                groupMembers.stream()
-//                .map(GroupMember::getMember)
-//                .filter(member -> member.getId().equals(dto.getRequesterId()))
-//                .findFirst()
-//                .orElseThrow(() -> new EntityNotFoundException(
-//                        String.format("User Not Found. No user found with ID=%s", dto.getRequesterId()),
-//                        User.class
-//                ));
-
-        if (!splittValidator.isUserRegistered(requester)) {
-            throw new CustomValidationException("User Not Registered. " +
-                    "Only registered users can manage repayments.");
-        }
-    }
-
-    private User extractUserFromGroupMembers(List<GroupMember> groupMembers, Long userId) {
-        return groupMembers.stream()
-                .map(GroupMember::getMember)
-                .filter(member -> userId.equals(member.getId()))
-                .findFirst()
-                .orElseThrow(() -> new EntityNotFoundException(
-                        String.format("User Not Found. No user found with ID=%s", userId),
-                        User.class
-                ));
-    }
-
 
     // -------------
     // Repository
@@ -150,17 +106,45 @@ public class RepaymentServiceImpl implements RepaymentService {
     }
 
     private List<GroupMember> findGroupMembersInCreateDto(RepaymentCreateDto dto) {
-        Set<Long> usersIds = new HashSet<>(Set.of(
-                dto.getRequesterId(),
-                dto.getPayerId(),
-                dto.getRecipientId()
-        ));
+//        Set<Long> usersIds = new HashSet<>(Set.of(
+//                dto.getRequesterId(),
+//                dto.getPayerId(),
+//                dto.getRecipientId()
+//        ));
+
+        Set<Long> usersIds = new HashSet<>();
+        usersIds.add(dto.getRequesterId());
+        usersIds.add(dto.getPayerId());
+        usersIds.add(dto.getRecipientId());
 
         List<GroupMemberId> searchIds = usersIds.stream()
                 .map(userId -> new GroupMemberId(userId, dto.getGroupId()))
                 .toList();
 
         return groupMemberRepository.findByIdIn(searchIds);
+    }
+
+    // ------------------
+    // Auxiliary Methods
+    // ------------------
+
+    private User extractUserFromGroupMembers(List<GroupMember> groupMembers, Long userId) {
+        return groupMembers.stream()
+                .map(GroupMember::getMember)
+                .filter(member -> userId.equals(member.getId()))
+                .findFirst()
+                .orElseThrow(() -> new EntityNotFoundException(
+                        String.format("User Not Found. User with ID=%s does not " +
+                                "have access to the group or does not exist.", userId),
+                        User.class
+                ));
+    }
+
+    private User extractRequesterBeforeAdd(List<GroupMember> groupMembers,
+                                           Long requesterId) {
+        User requester = extractUserFromGroupMembers(groupMembers, requesterId);
+        validateRequesterIsRegistered(requester);
+        return requester;
     }
 
     // -------------
@@ -189,5 +173,28 @@ public class RepaymentServiceImpl implements RepaymentService {
         }
     }
 
+    // TODO удалить
+    private void validateRequesterBeforeAdd(List<GroupMember> groupMembers,
+                                            RepaymentCreateDto dto) {
+        User requester = extractUserFromGroupMembers(groupMembers, dto.getRequesterId());
+//                groupMembers.stream()
+//                .map(GroupMember::getMember)
+//                .filter(member -> member.getId().equals(dto.getRequesterId()))
+//                .findFirst()
+//                .orElseThrow(() -> new EntityNotFoundException(
+//                        String.format("User Not Found. No user found with ID=%s", dto.getRequesterId()),
+//                        User.class
+//                ));
 
+        if (!splittValidator.isUserRegistered(requester)) {
+            throw new CustomValidationException("User Not Registered. " +
+                    "Only registered users can manage repayments.");
+        }
+    }
+
+    // TODO удалить
+    private void validatePayerAndRecipientBeforeAdd(List<GroupMember> groupMembers,
+                                                    RepaymentCreateDto dto) {
+        extractUserFromGroupMembers(groupMembers, dto.getPayerId());
+    }
 }

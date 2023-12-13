@@ -1,7 +1,7 @@
 package com.example.splitt.bill.dto.expense;
 
 import com.example.splitt.bill.dto.GroupBalanceOutDto;
-import com.example.splitt.bill.dto.shares.UserSplitOutDto;
+import com.example.splitt.util.balance.dto.UserSplitOutDto;
 import com.example.splitt.user.dto.UserOutShortDto;
 import lombok.*;
 

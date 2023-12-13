@@ -1,6 +1,6 @@
 package com.example.splitt.bill.mapper;
 
-import com.example.splitt.bill.dto.shares.UserSplitDto;
+import com.example.splitt.util.balance.dto.UserSplitDto;
 import com.example.splitt.bill.model.bill.Bill;
 import com.example.splitt.bill.model.transaction.Transaction;
 import com.example.splitt.bill.model.transaction.TransactionType;

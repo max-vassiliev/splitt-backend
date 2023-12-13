@@ -11,7 +11,6 @@ import java.util.function.Predicate;
 
 @Component
 @Transactional(readOnly = true)
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class SplittValidator {
 
     public boolean isEmpty(String str) {

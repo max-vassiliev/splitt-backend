@@ -1,9 +1,6 @@
 package com.example.splitt.bill.dto.repayment;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -32,6 +29,8 @@ public class RepaymentCreateDto {
     private String note;
 
     @NotNull(message = "Amount Missing. Please add the repayment amount.")
+    @DecimalMin(value = "0.0", inclusive = false,
+            message = "Amount Value Error. The amount must be greater than 0.")
     private Float amount;
 
     @NotBlank(message = "Date Missing. Please add the date the repayment was made.")

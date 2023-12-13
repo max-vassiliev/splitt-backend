@@ -1,7 +1,5 @@
-package com.example.splitt.bill.dto;
+package com.example.splitt.util.balance.dto;
 
-import com.example.splitt.util.balance.dto.UserSplitOutDto;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,15 +10,14 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @ToString
-public class GroupBalanceOutDto {
+public class UserBalanceOutDto {
 
     private Long userId;
 
     private String userName;
 
-    private Float balance;
+    private float balance;
 
     private List<UserSplitOutDto> details;
 

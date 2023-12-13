@@ -1,6 +1,6 @@
 package com.example.splitt.bill.dto.expense;
 
-import com.example.splitt.bill.dto.shares.UserSplitDto;
+import com.example.splitt.util.balance.dto.UserSplitDto;
 import com.example.splitt.error.exception.CustomValidationException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;

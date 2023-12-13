@@ -1,4 +1,4 @@
-package com.example.splitt.bill.dto.shares;
+package com.example.splitt.util.balance.dto;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
