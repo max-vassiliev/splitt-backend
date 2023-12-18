@@ -2,6 +2,7 @@ package com.example.splitt.bill.dto.repayment;
 
 import com.example.splitt.bill.dto.GroupBalanceOutDto;
 import com.example.splitt.user.dto.UserOutShortDto;
+import com.example.splitt.util.balance.dto.UserBalanceOutDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -33,6 +34,6 @@ public class RepaymentOutDto {
 
     private UserOutShortDto addedBy;
 
-    List<GroupBalanceOutDto> groupBalance;
+    List<UserBalanceOutDto> groupBalances;
 
 }

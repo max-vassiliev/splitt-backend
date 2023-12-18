@@ -1,5 +1,6 @@
 package com.example.splitt.bill.model.bill;
 
+import com.example.splitt.bill.dto.GroupBalanceOutDto;
 import com.example.splitt.bill.model.transaction.Transaction;
 import com.example.splitt.user.model.User;
 import jakarta.persistence.Column;
@@ -64,7 +65,11 @@ public class Bill {
     private List<Transaction> debts;
 
     @Transient
-    private Transaction repayment;
+    private Transaction repaymentTo;
+
+    @Transient
+    private Transaction repaymentFrom;
+
 
     @Override
     public boolean equals(Object o) {

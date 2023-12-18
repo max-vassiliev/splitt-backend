@@ -1,6 +1,7 @@
 package com.example.splitt.group.dto;
 
 import com.example.splitt.user.dto.UserOutputDto;
+import com.example.splitt.util.balance.dto.UserBalanceOutDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,6 +22,8 @@ public class GroupOutputDto {
     private String title;
 
     private List<UserOutputDto> members;
+
+    private List<UserBalanceOutDto> groupBalances;
 
 //    TODO later
 //    private List<Bill> bills;

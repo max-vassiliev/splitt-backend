@@ -40,14 +40,16 @@ public class TransactionMapper {
         return transactions;
     }
 
-    public Transaction toRepayment(User payer, User recipient, Group group,
-                                              Bill bill, int amount) {
+    public Transaction toRepayment(User user, Group group, Bill bill, int amount, boolean isRepaymentFrom) {
         Transaction repayment = new Transaction();
-        repayment.setType(TransactionType.REPAYMENT);
+        if (isRepaymentFrom) {
+            repayment.setType(TransactionType.REPAYMENT_FROM);
+        } else {
+            repayment.setType(TransactionType.REPAYMENT_TO);
+        }
         repayment.setGroup(group);
         repayment.setBill(bill);
-        repayment.setUser(payer);
-        repayment.setRecipient(recipient);
+        repayment.setUser(user);
         repayment.setAmount(amount);
         return  repayment;
     }

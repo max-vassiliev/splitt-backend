@@ -10,16 +10,22 @@ import java.util.List;
 
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
 
+
+    // TODO обновить запрос с REPAYMENT:
+    // для внесшего платеж это +amount
+    // для получателя это -amount
+
     @Query("select new com.example.splitt.util.balance.model.UserBalance(t.user.id," +
             "t.user.name, " +
-            "sum(case when t.type = 'EXPENSE' then t.amount " +
-            "when t.type = 'REPAYMENT' then t.amount " +
+            "sum(case when t.type = 'PAYMENT' then t.amount " +
+            "when t.type = 'REPAYMENT_FROM' then t.amount " +
+            "when t.type = 'REPAYMENT_TO' then -t.amount  " +
             "when t.type = 'DEBT' then -t.amount " +
             "else 0 " +
             "end)) " +
             "from Transaction t " +
             "where t.group.id = :groupId " +
-            "group by t.user.id " +
+            "group by t.user.id, t.user.name " +
             "order by t.user.id")
     List<UserBalance> getUserBalancesInGroup(@Param("groupId") Long groupId);
 

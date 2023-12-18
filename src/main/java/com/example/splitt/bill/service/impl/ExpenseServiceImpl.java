@@ -2,6 +2,8 @@ package com.example.splitt.bill.service.impl;
 
 import com.example.splitt.bill.dto.expense.ExpenseOutDto;
 import com.example.splitt.bill.dto.expense.ExpenseCreateDto;
+import com.example.splitt.util.balance.SplittCalculator;
+import com.example.splitt.util.balance.dto.UserBalanceOutDto;
 import com.example.splitt.util.balance.dto.UserSplitDto;
 import com.example.splitt.bill.mapper.BillMapper;
 import com.example.splitt.bill.mapper.TransactionMapper;
@@ -22,6 +24,7 @@ import com.example.splitt.group.repository.GroupRepository;
 import com.example.splitt.user.model.User;
 import com.example.splitt.user.repository.UserRepository;
 import com.example.splitt.util.SplittValidator;
+import com.example.splitt.util.balance.model.UserBalance;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -56,6 +59,9 @@ public class ExpenseServiceImpl implements ExpenseService {
     private final TransactionMapper transactionMapper;
 
     private final SplittValidator splittValidator;
+
+    private final SplittCalculator splittCalculator;
+
 
     @Override
     @Transactional
@@ -95,8 +101,11 @@ public class ExpenseServiceImpl implements ExpenseService {
         bill.setPayments(payments);
         bill.setDebts(debts);
 
-        return billMapper.toExpenseOutDto(bill);
+        List<UserBalanceOutDto> groupBalances = countGroupBalances(group.getId());
+
+        return billMapper.toExpenseOutDto(bill, groupBalances);
     }
+
 
     // -------------
     // Repository
@@ -128,10 +137,18 @@ public class ExpenseServiceImpl implements ExpenseService {
         return groupMemberRepository.findByIdGroupId(groupId);
     }
 
+    private List<UserBalance> getUserBalancesInGroup(Long groupId) {
+        return transactionRepository.getUserBalancesInGroup(groupId);
+    }
+
     // ------------------
     // Auxiliary Methods
     // ------------------
 
+    private List<UserBalanceOutDto> countGroupBalances(Long groupId) {
+        List<UserBalance> userBalances = getUserBalancesInGroup(groupId);
+        return splittCalculator.calculateBalance(userBalances);
+    }
 
     // -------------
     // Validation
@@ -178,7 +195,7 @@ public class ExpenseServiceImpl implements ExpenseService {
 
         dtoIds.addAll(expenseDto.getDebtShares().stream()
                 .map(UserSplitDto::getUserId)
-                .collect(Collectors.toList()));
+                .toList());
 
         if (!groupMembersIds.containsAll(dtoIds)) {
             Set<Long> missingUserIds = dtoIds.stream()

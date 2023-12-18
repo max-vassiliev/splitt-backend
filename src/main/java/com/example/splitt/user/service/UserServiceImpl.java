@@ -9,6 +9,8 @@ import com.example.splitt.user.mapper.UserMapper;
 import com.example.splitt.user.model.User;
 import com.example.splitt.user.repository.UserRepository;
 import com.example.splitt.util.SplittValidator;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

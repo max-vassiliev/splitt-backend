@@ -1,5 +1,6 @@
 package com.example.splitt.group.service;
 
+import com.example.splitt.bill.repository.TransactionRepository;
 import com.example.splitt.error.exception.CustomValidationException;
 import com.example.splitt.error.exception.EntityNotFoundException;
 import com.example.splitt.group.dto.GroupCreateDto;
@@ -21,6 +22,9 @@ import com.example.splitt.group.model.Group;
 import com.example.splitt.user.model.User;
 import com.example.splitt.user.repository.UserRepository;
 import com.example.splitt.util.SplittValidator;
+import com.example.splitt.util.balance.SplittCalculator;
+import com.example.splitt.util.balance.dto.UserBalanceOutDto;
+import com.example.splitt.util.balance.model.UserBalance;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -50,7 +54,11 @@ public class GroupServiceImpl implements GroupService {
 
     private final UserRepository userRepository;
 
+    private final TransactionRepository transactionRepository;
+
     private final SplittValidator splittValidator;
+
+    private final SplittCalculator splittCalculator;
 
     private final GroupMapper groupMapper;
 
@@ -66,7 +74,9 @@ public class GroupServiceImpl implements GroupService {
         List<GroupMember> foundGroupMembers = getMembersByGroupId(groupId);
         populateGroup(group, foundGroupMembers);
 
-        return groupMapper.toGroupOutputDto(group);
+        List<UserBalanceOutDto> groupBalances = countGroupBalances(groupId);
+
+        return groupMapper.toGroupOutputDto(group, groupBalances);
     }
 
     @Override
@@ -190,9 +200,18 @@ public class GroupServiceImpl implements GroupService {
         return userRepository.saveAll(newUsers);
     }
 
+    private List<UserBalance> getUserBalancesInGroup(Long groupId) {
+        return transactionRepository.getUserBalancesInGroup(groupId);
+    }
+
     // ------------------
     // Auxiliary Methods
     // ------------------
+
+    private List<UserBalanceOutDto> countGroupBalances(Long groupId) {
+        List<UserBalance> userBalances = getUserBalancesInGroup(groupId);
+        return splittCalculator.calculateBalance(userBalances);
+    }
 
     private void populateGroup(Group group, List<GroupMember> groupMembers) {
         Set<User> members = groupMembers.stream()

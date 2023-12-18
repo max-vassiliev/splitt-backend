@@ -4,6 +4,7 @@ public enum TransactionType {
 
     DEBT,
     PAYMENT,
-    REPAYMENT
+    REPAYMENT_TO,
+    REPAYMENT_FROM
 
 }

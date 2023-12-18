@@ -11,17 +11,22 @@ import com.example.splitt.bill.repository.TransactionRepository;
 import com.example.splitt.bill.service.RepaymentService;
 import com.example.splitt.error.exception.CustomValidationException;
 import com.example.splitt.error.exception.EntityNotFoundException;
+import com.example.splitt.group.model.Group;
 import com.example.splitt.group.model.GroupMember;
 import com.example.splitt.group.model.GroupMemberId;
 import com.example.splitt.group.repository.GroupMemberRepository;
 import com.example.splitt.user.model.User;
 import com.example.splitt.user.repository.UserRepository;
 import com.example.splitt.util.SplittValidator;
+import com.example.splitt.util.balance.SplittCalculator;
+import com.example.splitt.util.balance.dto.UserBalanceOutDto;
+import com.example.splitt.util.balance.model.UserBalance;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -45,16 +50,16 @@ public class RepaymentServiceImpl implements RepaymentService {
 
     private final SplittValidator splittValidator;
 
+    private final SplittCalculator splittCalculator;
+
 
     @Override
     @Transactional
     public RepaymentOutDto add(RepaymentCreateDto dto) {
 
         // Validate and retrieve data
+
         validatePayerNotRecipient(dto);
-        
-//        User requester2 = getUserById(dto.getRequesterId()); // TODO удалить потом
-//        validateRequesterIsRegistered(requester2);
         
         List<GroupMember> groupMembers = findGroupMembersInCreateDto(dto);
         validateGroupMembersNotEmpty(groupMembers);
@@ -62,21 +67,29 @@ public class RepaymentServiceImpl implements RepaymentService {
         validateRequesterIsRegistered(requester);
         User payer = extractUserFromGroupMembers(groupMembers, dto.getPayerId());
         User recipient = extractUserFromGroupMembers(groupMembers, dto.getRecipientId());
+        Group group = groupMembers.get(0).getGroup();
 
         // Save
 
         Bill billToSave = billMapper.toRepaymentBill(dto, requester);
         Bill savedBill = billRepository.save(billToSave);
 
-        Transaction transactionToSave = transactionMapper.toRepayment(payer, recipient,
-                groupMembers.get(0).getGroup(), savedBill, savedBill.getAmount());
-        Transaction savedTransaction = transactionRepository.save(transactionToSave);
+        Transaction repaymentFrom = transactionMapper.toRepayment(payer, group, savedBill,
+                savedBill.getAmount(), true);
+        Transaction repaymentTo = transactionMapper.toRepayment(recipient, group, savedBill,
+                savedBill.getAmount(), false);
+
+        Transaction repaymentToSaved = transactionRepository.save(repaymentTo);
+        Transaction repaymentFromSaved = transactionRepository.save(repaymentFrom);
 
         // Prepare for output
 
-        savedBill.setRepayment(savedTransaction);
+        savedBill.setRepaymentTo(repaymentToSaved);
+        savedBill.setRepaymentFrom(repaymentFromSaved);
 
-        return billMapper.toRepaymentOutDto(savedBill);
+        List<UserBalanceOutDto> groupBalances = countGroupBalances(group.getId());
+
+        return billMapper.toRepaymentOutDto(savedBill, groupBalances);
     }
 
     // -------------
@@ -106,12 +119,6 @@ public class RepaymentServiceImpl implements RepaymentService {
     }
 
     private List<GroupMember> findGroupMembersInCreateDto(RepaymentCreateDto dto) {
-//        Set<Long> usersIds = new HashSet<>(Set.of(
-//                dto.getRequesterId(),
-//                dto.getPayerId(),
-//                dto.getRecipientId()
-//        ));
-
         Set<Long> usersIds = new HashSet<>();
         usersIds.add(dto.getRequesterId());
         usersIds.add(dto.getPayerId());
@@ -124,9 +131,18 @@ public class RepaymentServiceImpl implements RepaymentService {
         return groupMemberRepository.findByIdIn(searchIds);
     }
 
+    private List<UserBalance> getUserBalancesInGroup(Long groupId) {
+        return transactionRepository.getUserBalancesInGroup(groupId);
+    }
+
     // ------------------
     // Auxiliary Methods
     // ------------------
+
+    private List<UserBalanceOutDto> countGroupBalances(Long groupId) {
+        List<UserBalance> userBalances = getUserBalancesInGroup(groupId);
+        return splittCalculator.calculateBalance(userBalances);
+    }
 
     private User extractUserFromGroupMembers(List<GroupMember> groupMembers, Long userId) {
         return groupMembers.stream()

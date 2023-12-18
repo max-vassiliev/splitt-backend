@@ -4,6 +4,7 @@ import com.example.splitt.bill.dto.expense.ExpenseOutDto;
 import com.example.splitt.bill.dto.expense.ExpenseCreateDto;
 import com.example.splitt.bill.dto.repayment.RepaymentCreateDto;
 import com.example.splitt.bill.dto.repayment.RepaymentOutDto;
+import com.example.splitt.util.balance.dto.UserBalanceOutDto;
 import com.example.splitt.util.balance.dto.UserSplitOutDto;
 import com.example.splitt.bill.model.bill.Bill;
 import com.example.splitt.bill.model.bill.BillType;
@@ -58,7 +59,7 @@ public class BillMapper {
         return bill;
     }
 
-    public ExpenseOutDto toExpenseOutDto(Bill bill) {
+    public ExpenseOutDto toExpenseOutDto(Bill bill, List<UserBalanceOutDto> groupBalances) {
         UserOutShortDto addedBy = userMapper.toUserOutShortDto(bill.getAddedBy());
         List<UserSplitOutDto> paidBy = bill.getPayments().stream()
                 .map(transactionMapperLite::toUserSplitOutDto)
@@ -67,27 +68,25 @@ public class BillMapper {
                 .map(transactionMapperLite::toUserSplitOutDto)
                 .collect(Collectors.toList());
 
-        // TODO List<GroupBalanceOutDto> groupBalance;
-
         ExpenseOutDto outputDto = billMapperLite.toExpenseOutDto(bill);
         outputDto.setAddedBy(addedBy);
         outputDto.setPaidBy(paidBy);
         outputDto.setDebtShares(debtShares);
+        outputDto.setGroupBalances(groupBalances);
 
         return outputDto;
     }
 
-    public RepaymentOutDto toRepaymentOutDto(Bill bill) {
-        UserOutShortDto payer = userMapper.toUserOutShortDto(bill.getRepayment().getUser());
-        UserOutShortDto recipient = userMapper.toUserOutShortDto(bill.getRepayment().getRecipient());
+    public RepaymentOutDto toRepaymentOutDto(Bill bill, List<UserBalanceOutDto> groupBalances) {
+        UserOutShortDto payer = userMapper.toUserOutShortDto(bill.getRepaymentFrom().getUser());
+        UserOutShortDto recipient = userMapper.toUserOutShortDto(bill.getRepaymentTo().getUser());
         UserOutShortDto addedBy = userMapper.toUserOutShortDto(bill.getAddedBy());
-
-        // TODO List<GroupBalanceOutDto> groupBalance;
 
         RepaymentOutDto outputDto = billMapperLite.toRepaymentOutDto(bill);
         outputDto.setPayer(payer);
         outputDto.setRecipient(recipient);
         outputDto.setAddedBy(addedBy);
+        outputDto.setGroupBalances(groupBalances);
 
         return outputDto;
     }
