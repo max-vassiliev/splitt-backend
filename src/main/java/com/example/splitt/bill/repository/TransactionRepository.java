@@ -29,4 +29,5 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             "order by t.user.id")
     List<UserBalance> getUserBalancesInGroup(@Param("groupId") Long groupId);
 
+    List<Transaction> findAllByBill_IdIn(List<Long> billIds);
 }

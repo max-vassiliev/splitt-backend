@@ -18,7 +18,6 @@ public interface BillMapperLite {
 
     String REPAYMENT_DEFAULT_TITLE = "Repayment ##autotitle##";
 
-//    @Mapping(target = "type", expression = "java(BillType.EXPENSE)")
     @Mapping(target = "amount", source = "amount", qualifiedByName = "amountToInt")
     @Mapping(target = "date", source = "date", dateFormat = SPLITT_DATE_FORMAT)
     Bill toExpenseBill(ExpenseCreateDto expenseDto);

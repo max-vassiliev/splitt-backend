@@ -1,6 +1,7 @@
 package com.example.splitt.bill.dto.expense;
 
 import com.example.splitt.bill.dto.GroupBalanceOutDto;
+import com.example.splitt.bill.dto.bill.BillOutDto;
 import com.example.splitt.util.balance.dto.UserBalanceOutDto;
 import com.example.splitt.util.balance.dto.UserSplitOutDto;
 import com.example.splitt.user.dto.UserOutShortDto;
@@ -13,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class ExpenseOutDto {
+public class ExpenseOutDto extends BillOutDto {
 
     private Long id;
 

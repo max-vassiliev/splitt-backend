@@ -1,5 +1,6 @@
 package com.example.splitt.bill.mapper;
 
+import com.example.splitt.bill.dto.bill.BillOutDto;
 import com.example.splitt.bill.dto.expense.ExpenseOutDto;
 import com.example.splitt.bill.dto.expense.ExpenseCreateDto;
 import com.example.splitt.bill.dto.repayment.RepaymentCreateDto;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Component
@@ -89,5 +91,12 @@ public class BillMapper {
         outputDto.setGroupBalances(groupBalances);
 
         return outputDto;
+    }
+
+    public BillOutDto toBillOutDto(Bill bill) {
+        if (BillType.REPAYMENT.equals(bill.getType())) {
+            return toRepaymentOutDto(bill, null);
+        }
+        return toExpenseOutDto(bill, null);
     }
 }

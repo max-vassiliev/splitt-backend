@@ -45,8 +45,6 @@ public class UserBalanceMapper {
     }
 
     private float convertAmount(int amount) {
-        return (float) (amount / AMOUNT_CONVERSION_FACTOR);
+        return (float) amount / AMOUNT_CONVERSION_FACTOR;
     }
-
-
 }

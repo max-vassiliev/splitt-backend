@@ -30,13 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -66,10 +60,12 @@ public class GroupServiceImpl implements GroupService {
 
 
     @Override
+    @Transactional
     public GroupOutputDto findById(Long groupId, Long requesterId) {
         GroupMemberId searchId = new GroupMemberId(requesterId, groupId);
         GroupMember groupRequester = getGroupMemberById(searchId);
         Group group = groupRequester.getGroup();
+        updateLastViewedGroup(groupRequester.getMember(), group);
 
         List<GroupMember> foundGroupMembers = getMembersByGroupId(groupId);
         populateGroup(group, foundGroupMembers);
@@ -202,6 +198,16 @@ public class GroupServiceImpl implements GroupService {
 
     private List<UserBalance> getUserBalancesInGroup(Long groupId) {
         return transactionRepository.getUserBalancesInGroup(groupId);
+    }
+
+    private void updateLastViewedGroup(User requester, Group group) {
+
+        if (requester.getLastViewedGroup() != null &&
+                Objects.equals(requester.getLastViewedGroup().getId(), group.getId())) {
+            return;
+        }
+        requester.setLastViewedGroup(group);
+        userRepository.flush();
     }
 
     // ------------------

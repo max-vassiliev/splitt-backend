@@ -1,13 +1,7 @@
 package com.example.splitt.user.model;
 
 import com.example.splitt.group.model.Group;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,6 +30,10 @@ public class User {
 
     @Column(name = "password", length = 100)
     private String password;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "last_viewed_group_id")
+    private Group lastViewedGroup;
 
     @Transient
     private Set<Group> groups;

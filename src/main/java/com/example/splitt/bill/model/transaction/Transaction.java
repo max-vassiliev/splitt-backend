@@ -45,10 +45,6 @@ public class Transaction {
     @JoinColumn(name = "user_id")
     private User user;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "recipient_id")
-//    private User recipient;
-
     @Column(name = "amount", nullable = false)
     private int amount;
 

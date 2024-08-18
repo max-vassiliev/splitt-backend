@@ -1,5 +1,6 @@
 package com.example.splitt.util.balance;
 
+import com.example.splitt.error.exception.CustomValidationException;
 import com.example.splitt.util.balance.dto.UserBalanceOutDto;
 import com.example.splitt.util.balance.mapper.UserBalanceMapper;
 import com.example.splitt.util.balance.model.UserBalance;
@@ -8,7 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
@@ -20,6 +25,7 @@ public class SplittCalculator {
 
     public List<UserBalanceOutDto> calculateBalance(List<UserBalance> balances) {
         if (balances.isEmpty()) return Collections.emptyList();
+        checkBalancesAreBalanced(balances);
 
         Map<Long, Map<Long, Integer>> debtors = new HashMap<>();
         Map<Long, Map<Long, Integer>> creditors = new HashMap<>();
@@ -27,6 +33,10 @@ public class SplittCalculator {
 
         return covertForOutput(balances, debtors, creditors);
     }
+
+    // ------------------
+    // Auxiliary Methods
+    // ------------------
 
     private void countDebtRec(List<UserBalance> userBalances,
                               Map<Long, Map<Long, Integer>> debtors,
@@ -76,7 +86,6 @@ public class SplittCalculator {
                 (creditorCredits.getOrDefault(debtorId, 0) + amount));
     }
 
-
     private List<UserBalanceOutDto> covertForOutput(List<UserBalance> userBalances,
                                                     Map<Long, Map<Long, Integer>> debtors,
                                                     Map<Long, Map<Long, Integer>> creditors) {
@@ -97,5 +106,23 @@ public class SplittCalculator {
         outputDto.addAll(creditorsDto);
 
         return outputDto;
+    }
+
+    // -------------
+    // Validation
+    // -------------
+
+    private void checkBalancesAreBalanced(List<UserBalance> userBalances) {
+        if (!areBalanced(userBalances)) {
+            throw new CustomValidationException("Group Balances Unbalanced");
+        }
+    }
+
+    private boolean areBalanced(List<UserBalance> userBalances) {
+        int sumOfAmounts = userBalances.stream()
+                .mapToInt(UserBalance::getAmount)
+                .sum();
+
+        return sumOfAmounts == 0;
     }
 }
