@@ -17,8 +17,8 @@ public class UserBalanceOutDto {
 
     private String userName;
 
-    private float balance;
+    private int balance;
 
-    private List<UserSplitOutDto> details;
+    private List<UserSplittOutDto> details;
 
 }

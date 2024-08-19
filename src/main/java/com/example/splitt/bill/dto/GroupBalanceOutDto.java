@@ -1,6 +1,6 @@
 package com.example.splitt.bill.dto;
 
-import com.example.splitt.util.balance.dto.UserSplitOutDto;
+import com.example.splitt.util.balance.dto.UserSplittOutDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,8 +20,8 @@ public class GroupBalanceOutDto {
 
     private String userName;
 
-    private Float balance;
+    private Integer balance;
 
-    private List<UserSplitOutDto> details;
+    private List<UserSplittOutDto> details;
 
 }

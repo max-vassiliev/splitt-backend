@@ -1,5 +1,8 @@
 package com.example.splitt.bill.dto.repayment;
 
+import com.example.splitt.bill.dto.validation.IntegerOnly;
+import com.example.splitt.bill.dto.validation.StrictIntegerDeserializer;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,9 +32,10 @@ public class RepaymentCreateDto {
     private String note;
 
     @NotNull(message = "Amount Missing. Please add the repayment amount.")
-    @DecimalMin(value = "0.0", inclusive = false,
-            message = "Amount Value Error. The amount must be greater than 0.")
-    private Float amount;
+    @Positive
+    @IntegerOnly
+    @JsonDeserialize(using = StrictIntegerDeserializer.class)
+    private Integer amount;
 
     @NotBlank(message = "Date Missing. Please add the date the repayment was made.")
     @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}",

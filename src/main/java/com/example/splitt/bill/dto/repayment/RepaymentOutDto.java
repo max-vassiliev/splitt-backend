@@ -23,7 +23,7 @@ public class RepaymentOutDto extends BillOutDto {
 
     private String note;
 
-    private float amount;
+    private int amount;
 
     private String date;
 

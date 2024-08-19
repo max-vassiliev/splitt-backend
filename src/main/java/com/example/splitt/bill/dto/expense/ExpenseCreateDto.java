@@ -1,12 +1,12 @@
 package com.example.splitt.bill.dto.expense;
 
-import com.example.splitt.util.balance.dto.UserSplitDto;
+import com.example.splitt.bill.dto.validation.IntegerOnly;
+import com.example.splitt.bill.dto.validation.StrictIntegerDeserializer;
+import com.example.splitt.util.balance.dto.UserSplittDto;
 import com.example.splitt.error.exception.CustomValidationException;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.util.List;
@@ -30,7 +30,10 @@ public class ExpenseCreateDto {
     private String note;
 
     @NotNull(message = "Expense Amount Absent. Please add expense amount.")
-    private Float amount;
+    @Positive
+    @IntegerOnly
+    @JsonDeserialize(using = StrictIntegerDeserializer.class)
+    private Integer amount;
 
     @NotBlank(message = "Expense Date Missing. Please add the date the expense was made.")
     @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}",
@@ -38,10 +41,10 @@ public class ExpenseCreateDto {
     private String date;
 
     @Valid
-    List<UserSplitDto> paidBy;
+    List<UserSplittDto> paidBy;
 
     @Valid
-    List<UserSplitDto> debtShares;
+    List<UserSplittDto> debtShares;
 
     public void validatePaidByNotEmpty() {
         if (isEmpty(paidBy)) {

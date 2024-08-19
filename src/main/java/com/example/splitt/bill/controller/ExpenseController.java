@@ -29,7 +29,7 @@ public class ExpenseController {
     @PostMapping
     public ExpenseOutDto add(@PathVariable(name = "groupId") Long groupId,
                              @RequestHeader(REQUESTER_ID_HEADER) Long requesterId,
-                                 @Valid @RequestBody ExpenseCreateDto expenseDto) {
+                             @Valid @RequestBody ExpenseCreateDto expenseDto) {
         log.info("POST /groups/{}/expenses/ | X-Requester-User-Id: {} | Request Body: {}", groupId,
                 requesterId, expenseDto);
         expenseDto.setRequesterId(requesterId);

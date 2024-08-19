@@ -3,6 +3,7 @@ package com.example.splitt.error;
 import com.example.splitt.error.exception.EntityNotFoundException;
 import com.example.splitt.error.model.ApiError;
 import com.example.splitt.error.exception.CustomValidationException;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -50,9 +51,16 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiError handleHttpMessageNotReadableException(final HttpMessageNotReadableException exception) {
         log.warn("400 - Bad Request: {}", exception.getMessage());
+        String errorMessage = "Request Body Missing";
+
+        Throwable cause = exception.getCause();
+        if (cause instanceof InvalidFormatException) {
+            errorMessage = exception.getMessage();
+        }
+
         return new ApiError(HttpStatus.BAD_REQUEST,
                 "Incorrectly made request.",
-                "Request Body Missing",
+                errorMessage,
                 LocalDateTime.now().format(DateTimeFormatter.ofPattern(SPLITT_DATE_TIME_FORMAT))
         );
     }

@@ -1,6 +1,6 @@
 package com.example.splitt.bill.mapper;
 
-import com.example.splitt.util.balance.dto.UserSplitOutDto;
+import com.example.splitt.util.balance.dto.UserSplittOutDto;
 import com.example.splitt.bill.model.transaction.Transaction;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -10,12 +10,7 @@ import org.mapstruct.Named;
 public interface TransactionMapperLite {
 
     @Mapping(target = "userId", source = "user.id")
-    @Mapping(target = "amount", source = "amount", qualifiedByName = "amountToInt")
     @Mapping(target = "userName", source = "user.name")
-    UserSplitOutDto toUserSplitOutDto(Transaction transaction);
+    UserSplittOutDto toUserSplitOutDto(Transaction transaction);
 
-    @Named("amountToInt")
-    static float mapAmountToFloat(int amount) {
-        return (float) amount / 100;
-    }
 }

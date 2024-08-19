@@ -1,7 +1,7 @@
 package com.example.splitt.util.balance.mapper;
 
 import com.example.splitt.util.balance.dto.UserBalanceOutDto;
-import com.example.splitt.util.balance.dto.UserSplitOutDto;
+import com.example.splitt.util.balance.dto.UserSplittOutDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -13,8 +13,6 @@ import java.util.Map;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class UserBalanceMapper {
 
-    private static final int AMOUNT_CONVERSION_FACTOR = 100;
-
     public UserBalanceOutDto toUserBalanceOutDto(Long userId,
                                                  Map<Long, Integer> shares,
                                                  Map<Long, String> userNames) {
@@ -22,7 +20,7 @@ public class UserBalanceMapper {
                 .mapToInt(Integer::intValue)
                 .sum();
 
-        List<UserSplitOutDto> details = shares.entrySet().stream()
+        List<UserSplittOutDto> details = shares.entrySet().stream()
                 .map(entry -> toUserSplitOutDto(entry.getKey(),
                         userNames.get(entry.getKey()),
                         entry.getValue()))
@@ -31,20 +29,17 @@ public class UserBalanceMapper {
         UserBalanceOutDto dto = new UserBalanceOutDto();
         dto.setUserId(userId);
         dto.setUserName(userNames.get(userId));
-        dto.setBalance(convertAmount(balance));
+        dto.setBalance(balance);
         dto.setDetails(details);
         return dto;
     }
 
-    private UserSplitOutDto toUserSplitOutDto(Long userId, String userName, int amount) {
-        UserSplitOutDto dto = new UserSplitOutDto();
+    private UserSplittOutDto toUserSplitOutDto(Long userId, String userName, int amount) {
+        UserSplittOutDto dto = new UserSplittOutDto();
         dto.setUserId(userId);
         dto.setUserName(userName);
-        dto.setAmount(convertAmount(amount));
+        dto.setAmount(amount);
         return dto;
     }
 
-    private float convertAmount(int amount) {
-        return (float) amount / AMOUNT_CONVERSION_FACTOR;
-    }
 }

@@ -4,13 +4,12 @@ import com.example.splitt.bill.dto.expense.ExpenseOutDto;
 import com.example.splitt.bill.dto.expense.ExpenseCreateDto;
 import com.example.splitt.util.balance.SplittCalculator;
 import com.example.splitt.util.balance.dto.UserBalanceOutDto;
-import com.example.splitt.util.balance.dto.UserSplitDto;
+import com.example.splitt.util.balance.dto.UserSplittDto;
 import com.example.splitt.bill.mapper.BillMapper;
 import com.example.splitt.bill.mapper.TransactionMapper;
 import com.example.splitt.bill.model.bill.Bill;
 import com.example.splitt.bill.model.transaction.Transaction;
 import com.example.splitt.bill.model.transaction.TransactionType;
-import com.example.splitt.bill.repository.BillPaymentRepository;
 import com.example.splitt.bill.repository.BillRepository;
 import com.example.splitt.bill.repository.TransactionRepository;
 import com.example.splitt.bill.service.ExpenseService;
@@ -20,7 +19,6 @@ import com.example.splitt.group.model.Group;
 import com.example.splitt.group.model.GroupMember;
 import com.example.splitt.group.model.GroupMemberId;
 import com.example.splitt.group.repository.GroupMemberRepository;
-import com.example.splitt.group.repository.GroupRepository;
 import com.example.splitt.user.model.User;
 import com.example.splitt.user.repository.UserRepository;
 import com.example.splitt.util.SplittValidator;
@@ -40,17 +38,11 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class ExpenseServiceImpl implements ExpenseService {
 
-    private static final int AMOUNT_CONVERSION_FACTOR = 100;
-
     private final BillRepository billRepository;
-
-    private final BillPaymentRepository billPaymentRepository;
 
     private final TransactionRepository transactionRepository;
 
     private final UserRepository userRepository;
-
-    private final GroupRepository groupRepository;
 
     private final GroupMemberRepository groupMemberRepository;
 
@@ -161,7 +153,7 @@ public class ExpenseServiceImpl implements ExpenseService {
         validateExpenseAmount(expenseDto.getAmount(), expenseDto.getDebtShares(), "debtShares");
     }
 
-    private void validateExpenseAmount(float expenseAmount, List<UserSplitDto> shares, String fieldName) {
+    private void validateExpenseAmount(int expenseAmount, List<UserSplittDto> shares, String fieldName) {
         if (!areSharesAddingUp(expenseAmount, shares)) {
             throw new CustomValidationException(String.format("Shares Not Adding Up. " +
                     "Please review shares in the field '%s'.", fieldName));
@@ -175,13 +167,12 @@ public class ExpenseServiceImpl implements ExpenseService {
         }
     }
 
-    private boolean areSharesAddingUp(float amount, List<UserSplitDto> userSplitDtos) {
-        int totalAmountExpected = (int) (amount * AMOUNT_CONVERSION_FACTOR);
-        int totalAmount = userSplitDtos.stream()
-                .map(dto -> (int) (dto.getAmount() * AMOUNT_CONVERSION_FACTOR))
+    private boolean areSharesAddingUp(int amount, List<UserSplittDto> userSplittDtos) {
+        int userSplittSum = userSplittDtos.stream()
+                .map(UserSplittDto::getAmount)
                 .reduce(0, Integer::sum);
 
-        return totalAmount == totalAmountExpected;
+        return userSplittSum == amount;
     }
 
     private void validateGroupMembers(List<GroupMember> groupMembers, ExpenseCreateDto expenseDto) {
@@ -190,11 +181,11 @@ public class ExpenseServiceImpl implements ExpenseService {
                 .collect(Collectors.toSet());
 
         Set<Long> dtoIds = expenseDto.getPaidBy().stream()
-                .map(UserSplitDto::getUserId)
+                .map(UserSplittDto::getUserId)
                 .collect(Collectors.toSet());
 
         dtoIds.addAll(expenseDto.getDebtShares().stream()
-                .map(UserSplitDto::getUserId)
+                .map(UserSplittDto::getUserId)
                 .toList());
 
         if (!groupMembersIds.containsAll(dtoIds)) {

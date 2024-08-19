@@ -9,12 +9,12 @@ import lombok.ToString;
 @Setter
 @NoArgsConstructor
 @ToString
-public class UserSplitOutDto extends UserSplitDto {
+public class UserSplittOutDto {
+
+    private Long userId;
 
     private String userName;
 
-    public UserSplitOutDto(Long userId, String userName, Float amount) {
-        super(userId, amount);
-        this.userName = userName;
-    }
+    private Integer amount;
+
 }

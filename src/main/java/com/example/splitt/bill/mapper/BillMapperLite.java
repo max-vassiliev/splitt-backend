@@ -18,38 +18,24 @@ public interface BillMapperLite {
 
     String REPAYMENT_DEFAULT_TITLE = "Repayment ##autotitle##";
 
-    @Mapping(target = "amount", source = "amount", qualifiedByName = "amountToInt")
     @Mapping(target = "date", source = "date", dateFormat = SPLITT_DATE_FORMAT)
     Bill toExpenseBill(ExpenseCreateDto expenseDto);
 
-    @Mapping(target = "amount", source = "amount", qualifiedByName = "amountToInt")
     @Mapping(target = "date", source = "date", dateFormat = SPLITT_DATE_FORMAT)
     Bill toRepaymentBill(RepaymentCreateDto dto);
 
     @Mapping(target = "addedBy", ignore = true)
-    @Mapping(target = "amount", source = "amount", qualifiedByName = "amountToInt")
     @Mapping(target = "date", source = "date", dateFormat = SPLITT_DATE_FORMAT)
     @Mapping(target = "addedOn", source = "addedOn", dateFormat = SPLITT_DATE_TIME_FORMAT)
     ExpenseOutDto toExpenseOutDto(Bill bill);
 
     @Mapping(target = "addedBy", ignore = true)
-    @Mapping(target = "amount", source = "amount", qualifiedByName = "amountToInt")
     @Mapping(target = "title", source = "title", qualifiedByName = "mapRepaymentTitle")
     @Mapping(target = "date", source = "date", dateFormat = SPLITT_DATE_FORMAT)
     @Mapping(target = "addedOn", source = "addedOn", dateFormat = SPLITT_DATE_TIME_FORMAT)
     RepaymentOutDto toRepaymentOutDto(Bill bill);
 
     // Auxiliary methods
-
-    @Named("amountToInt")
-    static int mapAmountToInt(Float amount) {
-        return (int) (amount * 100);
-    }
-
-    @Named("amountToInt")
-    static float mapAmountToFloat(int amount) {
-        return (float) amount / 100;
-    }
 
     @Named("mapRepaymentTitle")
     default String mapRepaymentTitle(String title) {

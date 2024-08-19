@@ -1,6 +1,6 @@
 package com.example.splitt.bill.mapper;
 
-import com.example.splitt.util.balance.dto.UserSplitDto;
+import com.example.splitt.util.balance.dto.UserSplittDto;
 import com.example.splitt.bill.model.bill.Bill;
 import com.example.splitt.bill.model.transaction.Transaction;
 import com.example.splitt.bill.model.transaction.TransactionType;
@@ -18,19 +18,17 @@ import java.util.Map;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class TransactionMapper {
 
-    private static final int AMOUNT_CONVERSION_FACTOR = 100;
-
     public List<Transaction> toTransactions(TransactionType transactionType,
-                                            List<UserSplitDto> userShares,
+                                            List<UserSplittDto> userShares,
                                             Group group,
                                             Bill bill,
                                             Map<Long, User> groupMembers) {
         List<Transaction> transactions = new ArrayList<>();
 
-        for (UserSplitDto userSplitDto : userShares) {
+        for (UserSplittDto userSplitDto : userShares) {
             Transaction transaction = new Transaction();
             transaction.setUser(groupMembers.get(userSplitDto.getUserId()));
-            transaction.setAmount(convertAmount(userSplitDto.getAmount()));
+            transaction.setAmount(userSplitDto.getAmount());
             transaction.setType(transactionType);
             transaction.setGroup(group);
             transaction.setBill(bill);
@@ -51,10 +49,6 @@ public class TransactionMapper {
         repayment.setBill(bill);
         repayment.setUser(user);
         repayment.setAmount(amount);
-        return  repayment;
-    }
-
-    private int convertAmount(float amountDto) {
-        return (int) (amountDto * AMOUNT_CONVERSION_FACTOR);
+        return repayment;
     }
 }

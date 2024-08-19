@@ -6,7 +6,7 @@ import com.example.splitt.bill.dto.expense.ExpenseCreateDto;
 import com.example.splitt.bill.dto.repayment.RepaymentCreateDto;
 import com.example.splitt.bill.dto.repayment.RepaymentOutDto;
 import com.example.splitt.util.balance.dto.UserBalanceOutDto;
-import com.example.splitt.util.balance.dto.UserSplitOutDto;
+import com.example.splitt.util.balance.dto.UserSplittOutDto;
 import com.example.splitt.bill.model.bill.Bill;
 import com.example.splitt.bill.model.bill.BillType;
 import com.example.splitt.user.dto.UserOutShortDto;
@@ -19,7 +19,6 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Component
@@ -63,10 +62,10 @@ public class BillMapper {
 
     public ExpenseOutDto toExpenseOutDto(Bill bill, List<UserBalanceOutDto> groupBalances) {
         UserOutShortDto addedBy = userMapper.toUserOutShortDto(bill.getAddedBy());
-        List<UserSplitOutDto> paidBy = bill.getPayments().stream()
+        List<UserSplittOutDto> paidBy = bill.getPayments().stream()
                 .map(transactionMapperLite::toUserSplitOutDto)
                 .collect(Collectors.toList());
-        List<UserSplitOutDto> debtShares = bill.getDebts().stream()
+        List<UserSplittOutDto> debtShares = bill.getDebts().stream()
                 .map(transactionMapperLite::toUserSplitOutDto)
                 .collect(Collectors.toList());
 

@@ -1,9 +1,8 @@
 package com.example.splitt.bill.dto.expense;
 
-import com.example.splitt.bill.dto.GroupBalanceOutDto;
 import com.example.splitt.bill.dto.bill.BillOutDto;
 import com.example.splitt.util.balance.dto.UserBalanceOutDto;
-import com.example.splitt.util.balance.dto.UserSplitOutDto;
+import com.example.splitt.util.balance.dto.UserSplittOutDto;
 import com.example.splitt.user.dto.UserOutShortDto;
 import lombok.*;
 
@@ -22,7 +21,7 @@ public class ExpenseOutDto extends BillOutDto {
 
     private String note;
 
-    private float amount;
+    private int amount;
 
     private String date;
 
@@ -30,9 +29,9 @@ public class ExpenseOutDto extends BillOutDto {
 
     private String addedOn;
 
-    private List<UserSplitOutDto> paidBy;
+    private List<UserSplittOutDto> paidBy;
 
-    private List<UserSplitOutDto> debtShares;
+    private List<UserSplittOutDto> debtShares;
 
     private List<UserBalanceOutDto> groupBalances;
 
