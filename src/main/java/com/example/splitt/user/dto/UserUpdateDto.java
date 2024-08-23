@@ -24,4 +24,7 @@ public class UserUpdateDto {
             "Password must be between {min} and {max} characters long.")
     private String password;
 
+    @Size(max = 50, message = "User Avatar Name Size Exceeded. Must not exceed {max} characters.")
+    private String avatar;
+
 }

@@ -1,15 +1,18 @@
 package com.example.splitt.group.controller;
 
 import com.example.splitt.group.dto.GroupCreateDto;
-import com.example.splitt.group.dto.GroupOutputDto;
+import com.example.splitt.group.dto.GroupOutputFullDto;
 import com.example.splitt.group.dto.GroupOutputShortDto;
 import com.example.splitt.group.dto.GroupUpdateDto;
 import com.example.splitt.group.dto.GroupUpdateMembersDto;
+import com.example.splitt.group.dto.page.GroupPageFullDto;
 import com.example.splitt.group.service.GroupService;
+import com.example.splitt.util.model.CustomPageRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -36,8 +40,8 @@ public class GroupController {
     private final GroupService groupService;
 
     @GetMapping("/{groupId}")
-    public GroupOutputDto getById(@RequestHeader(REQUESTER_ID_HEADER) Long requesterId,
-                                  @PathVariable(name = "groupId") Long groupId) {
+    public GroupOutputFullDto getById(@RequestHeader(REQUESTER_ID_HEADER) Long requesterId,
+                                      @PathVariable(name = "groupId") Long groupId) {
         log.info("GET /groups/{} | X-Requester-User-Id: {} ", groupId, requesterId);
         return groupService.findById(groupId, requesterId);
     }
@@ -48,18 +52,29 @@ public class GroupController {
         return groupService.findAllByUserId(userId);
     }
 
+    @GetMapping("/{groupId}/page/full")
+    public GroupPageFullDto getGroupFullPageById(@RequestHeader(REQUESTER_ID_HEADER) Long requesterId,
+                                                 @PathVariable(name = "groupId") Long groupId,
+                                                 @RequestParam(name = "from", defaultValue = "0") int from,
+                                                 @RequestParam(name = "size", defaultValue = "10") int size) {
+        log.info("GET /groups/{}/page/full?from={}&size={} | X-Requester-User-Id: {} ",
+                groupId, from, size, requesterId);
+        return groupService.getGroupFullPageById(groupId, requesterId,
+                new CustomPageRequest(from, size, Sort.by(Sort.Direction.DESC, "t.date")));
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public GroupOutputDto create(@RequestHeader(REQUESTER_ID_HEADER) Long requesterId,
-                                 @Valid @RequestBody GroupCreateDto dto) {
+    public GroupOutputFullDto create(@RequestHeader(REQUESTER_ID_HEADER) Long requesterId,
+                                     @Valid @RequestBody GroupCreateDto dto) {
         log.info("POST /groups | X-Requester-User-Id: {} | Request Body: {}", requesterId, dto);
         return groupService.create(requesterId, dto);
     }
 
     @PatchMapping("/{groupId}")
     public GroupOutputShortDto updateProperties(@PathVariable Long groupId,
-                                 @RequestHeader(REQUESTER_ID_HEADER) Long requesterId,
-                                 @Valid @RequestBody GroupUpdateDto dto) {
+                                                @RequestHeader(REQUESTER_ID_HEADER) Long requesterId,
+                                                @Valid @RequestBody GroupUpdateDto dto) {
         log.info("PATCH /groups/{} | X-Requester-User-Id: {} | Request Body: {}",
                 groupId, requesterId, dto);
         dto.setGroupId(groupId);
@@ -68,9 +83,9 @@ public class GroupController {
     }
 
     @PatchMapping("/{groupId}/members")
-    public GroupOutputDto updateMembers(@PathVariable Long groupId,
-                                        @RequestHeader(REQUESTER_ID_HEADER) Long requesterId,
-                                        @Valid @RequestBody GroupUpdateMembersDto dto) {
+    public GroupOutputFullDto updateMembers(@PathVariable Long groupId,
+                                            @RequestHeader(REQUESTER_ID_HEADER) Long requesterId,
+                                            @Valid @RequestBody GroupUpdateMembersDto dto) {
         log.info("PATCH /groups/{}/members | X-Requester-User-Id: {} | Request Body: {}",
                 groupId, requesterId, dto);
         dto.setGroupId(groupId);

@@ -1,7 +1,7 @@
 package com.example.splitt.util.balance.dto;
 
-import com.example.splitt.bill.dto.validation.IntegerOnly;
-import com.example.splitt.bill.dto.validation.StrictIntegerDeserializer;
+import com.example.splitt.transaction.dto.validation.IntegerOnly;
+import com.example.splitt.transaction.dto.validation.StrictIntegerDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;

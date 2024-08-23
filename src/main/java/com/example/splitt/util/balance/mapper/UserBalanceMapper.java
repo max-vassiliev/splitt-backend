@@ -13,33 +13,27 @@ import java.util.Map;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class UserBalanceMapper {
 
-    public UserBalanceOutDto toUserBalanceOutDto(Long userId,
-                                                 Map<Long, Integer> shares,
-                                                 Map<Long, String> userNames) {
+    public UserBalanceOutDto toUserBalanceOutDto(Long userId, Map<Long, Integer> shares) {
         int balance = shares.values().stream()
                 .mapToInt(Integer::intValue)
                 .sum();
 
         List<UserSplittOutDto> details = shares.entrySet().stream()
                 .map(entry -> toUserSplitOutDto(entry.getKey(),
-                        userNames.get(entry.getKey()),
                         entry.getValue()))
                 .toList();
 
         UserBalanceOutDto dto = new UserBalanceOutDto();
         dto.setUserId(userId);
-        dto.setUserName(userNames.get(userId));
         dto.setBalance(balance);
         dto.setDetails(details);
         return dto;
     }
 
-    private UserSplittOutDto toUserSplitOutDto(Long userId, String userName, int amount) {
+    private UserSplittOutDto toUserSplitOutDto(Long userId, int amount) {
         UserSplittOutDto dto = new UserSplittOutDto();
         dto.setUserId(userId);
-        dto.setUserName(userName);
         dto.setAmount(amount);
         return dto;
     }
-
 }

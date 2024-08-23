@@ -1,6 +1,7 @@
 package com.example.splitt.group.mapper;
 
 import com.example.splitt.group.dto.GroupOutputDto;
+import com.example.splitt.group.dto.GroupOutputFullDto;
 import com.example.splitt.group.dto.GroupOutputShortDto;
 import com.example.splitt.group.model.Group;
 import org.mapstruct.Mapper;
@@ -10,8 +11,10 @@ import org.mapstruct.Mapping;
 public interface GroupMapperLite {
 
     @Mapping(target = "members", ignore = true)
-    GroupOutputDto toGroupOutputDto(Group group);
+    GroupOutputFullDto toGroupOutputFullDto(Group group);
 
     GroupOutputShortDto toGroupOutputShortDto(Group group);
+
+    GroupOutputDto toGroupOutputDto(Group group);
 
 }

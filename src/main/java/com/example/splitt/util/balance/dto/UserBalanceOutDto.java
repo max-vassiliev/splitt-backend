@@ -15,8 +15,6 @@ public class UserBalanceOutDto {
 
     private Long userId;
 
-    private String userName;
-
     private int balance;
 
     private List<UserSplittOutDto> details;

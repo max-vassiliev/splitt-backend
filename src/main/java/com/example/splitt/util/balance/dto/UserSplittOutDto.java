@@ -13,8 +13,6 @@ public class UserSplittOutDto {
 
     private Long userId;
 
-    private String userName;
-
     private Integer amount;
 
 }

@@ -19,4 +19,6 @@ public class UserOutputDto {
 
     private String email;
 
+    private String avatar;
+
 }

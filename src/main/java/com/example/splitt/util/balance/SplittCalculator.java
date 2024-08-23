@@ -14,7 +14,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Component
 @Transactional(readOnly = true)
@@ -31,7 +30,7 @@ public class SplittCalculator {
         Map<Long, Map<Long, Integer>> creditors = new HashMap<>();
         countDebtRec(balances, debtors, creditors);
 
-        return covertForOutput(balances, debtors, creditors);
+        return covertForOutput(debtors, creditors);
     }
 
     // ------------------
@@ -86,19 +85,14 @@ public class SplittCalculator {
                 (creditorCredits.getOrDefault(debtorId, 0) + amount));
     }
 
-    private List<UserBalanceOutDto> covertForOutput(List<UserBalance> userBalances,
-                                                    Map<Long, Map<Long, Integer>> debtors,
+    private List<UserBalanceOutDto> covertForOutput(Map<Long, Map<Long, Integer>> debtors,
                                                     Map<Long, Map<Long, Integer>> creditors) {
-
-        Map<Long, String> userNames = userBalances.stream()
-                .collect(Collectors.toMap(UserBalance::getUserId, UserBalance::getUserName));
-
         List<UserBalanceOutDto> debtorsDto = debtors.entrySet().stream()
-                .map(entry -> userBalanceMapper.toUserBalanceOutDto(entry.getKey(), entry.getValue(), userNames))
+                .map(entry -> userBalanceMapper.toUserBalanceOutDto(entry.getKey(), entry.getValue()))
                 .toList();
 
         List<UserBalanceOutDto> creditorsDto = creditors.entrySet().stream()
-                .map(entry -> userBalanceMapper.toUserBalanceOutDto(entry.getKey(), entry.getValue(), userNames))
+                .map(entry -> userBalanceMapper.toUserBalanceOutDto(entry.getKey(), entry.getValue()))
                 .toList();
 
         List<UserBalanceOutDto> outputDto = new ArrayList<>();

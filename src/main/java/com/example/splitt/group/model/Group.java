@@ -1,7 +1,7 @@
 package com.example.splitt.group.model;
 
-import com.example.splitt.bill.model.bill.Bill;
-import com.example.splitt.bill.model.transaction.Transaction;
+import com.example.splitt.transaction.model.transaction.Transaction;
+import com.example.splitt.transaction.model.entry.Entry;
 import com.example.splitt.user.model.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -36,23 +36,23 @@ public class Group {
     @Column(name = "title", nullable = false)
     private String title;
 
+    @Column(name = "avatar")
+    private String avatar;
+
     @Transient
     private Set<User> members;
 
     @Transient
-    private List<Bill> bills;
-
-    @Transient
     private List<Transaction> transactions;
 
-    // TODO @Transient
-    // activities
+    @Transient
+    private List<Entry> entries;
 
     public Group(String title) {
         this.title = title;
         this.members = new HashSet<>();
-        this.bills = new ArrayList<>();
         this.transactions = new ArrayList<>();
+        this.entries = new ArrayList<>();
     }
 
     @Override

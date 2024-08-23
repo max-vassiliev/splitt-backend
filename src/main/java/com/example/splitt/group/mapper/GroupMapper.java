@@ -1,6 +1,6 @@
 package com.example.splitt.group.mapper;
 
-import com.example.splitt.group.dto.GroupOutputDto;
+import com.example.splitt.group.dto.GroupOutputFullDto;
 import com.example.splitt.group.model.Group;
 import com.example.splitt.user.dto.UserOutputDto;
 import com.example.splitt.util.balance.dto.UserBalanceOutDto;
@@ -19,8 +19,8 @@ public class GroupMapper {
 
     private final GroupMemberMapper memberMapper;
 
-    public GroupOutputDto toGroupOutputDto(Group group) {
-        GroupOutputDto groupDto = groupMapperLite.toGroupOutputDto(group);
+    public GroupOutputFullDto toGroupOutputFullDto(Group group) {
+        GroupOutputFullDto groupDto = groupMapperLite.toGroupOutputFullDto(group);
         if (group.getMembers() == null || group.getMembers().isEmpty()) {
             return groupDto;
         }
@@ -32,10 +32,9 @@ public class GroupMapper {
         return groupDto;
     }
 
-    public GroupOutputDto toGroupOutputDto(Group group, List<UserBalanceOutDto> groupBalances) {
-        GroupOutputDto outputDto = toGroupOutputDto(group);
+    public GroupOutputFullDto toGroupOutputFullDto(Group group, List<UserBalanceOutDto> groupBalances) {
+        GroupOutputFullDto outputDto = toGroupOutputFullDto(group);
         outputDto.setGroupBalances(groupBalances);
         return outputDto;
     }
-
 }

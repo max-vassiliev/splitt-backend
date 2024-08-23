@@ -17,4 +17,6 @@ public class UserOutShortDto {
 
     private String name;
 
+    private String avatar;
+
 }
