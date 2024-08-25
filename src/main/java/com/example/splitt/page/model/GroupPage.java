@@ -1,4 +1,4 @@
-package com.example.splitt.group.model.page;
+package com.example.splitt.page.model;
 
 import com.example.splitt.transaction.model.transaction.Transaction;
 import com.example.splitt.util.balance.model.UserBalance;

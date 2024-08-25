@@ -1,8 +1,12 @@
-package com.example.splitt.group.mapper;
+package com.example.splitt.page.mapper;
 
 import com.example.splitt.group.dto.GroupOutputDto;
-import com.example.splitt.group.dto.page.GroupPageFullDto;
-import com.example.splitt.group.model.page.GroupPageFull;
+import com.example.splitt.group.mapper.GroupMapperLite;
+import com.example.splitt.group.mapper.GroupMemberMapper;
+import com.example.splitt.page.dto.GroupPageDto;
+import com.example.splitt.page.dto.GroupPageFullDto;
+import com.example.splitt.page.model.GroupPage;
+import com.example.splitt.page.model.GroupPageFull;
 import com.example.splitt.transaction.dto.transaction.TransactionOutShortDto;
 import com.example.splitt.transaction.mapper.TransactionMapper;
 import com.example.splitt.user.dto.UserOutputDto;
@@ -21,6 +25,17 @@ public class GroupPageMapper {
     private final GroupMemberMapper memberMapper;
 
     private final TransactionMapper transactionMapper;
+
+    public GroupPageDto toGroupPageDto(GroupPage groupPage) {
+        GroupPageDto groupPageDto = new GroupPageDto();
+
+        List<TransactionOutShortDto> transactionsDto = groupPage.getTransactions().stream()
+                .map(transactionMapper::toTransactionOutShortDto)
+                .toList();
+        groupPageDto.setTransactions(transactionsDto);
+
+        return groupPageDto;
+    }
 
     public GroupPageFullDto toGroupPageFullDto(GroupPageFull groupPage) {
         GroupPageFullDto groupPageDto = new GroupPageFullDto();
@@ -42,5 +57,4 @@ public class GroupPageMapper {
 
         return groupPageDto;
     }
-
 }

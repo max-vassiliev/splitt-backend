@@ -3,7 +3,6 @@ package com.example.splitt.group.mapper;
 import com.example.splitt.group.dto.GroupOutputFullDto;
 import com.example.splitt.group.model.Group;
 import com.example.splitt.user.dto.UserOutputDto;
-import com.example.splitt.util.balance.dto.UserBalanceOutDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -30,11 +29,5 @@ public class GroupMapper {
                 .collect(Collectors.toList());
         groupDto.setMembers(members);
         return groupDto;
-    }
-
-    public GroupOutputFullDto toGroupOutputFullDto(Group group, List<UserBalanceOutDto> groupBalances) {
-        GroupOutputFullDto outputDto = toGroupOutputFullDto(group);
-        outputDto.setGroupBalances(groupBalances);
-        return outputDto;
     }
 }

@@ -5,14 +5,11 @@ import com.example.splitt.group.dto.GroupOutputFullDto;
 import com.example.splitt.group.dto.GroupOutputShortDto;
 import com.example.splitt.group.dto.GroupUpdateDto;
 import com.example.splitt.group.dto.GroupUpdateMembersDto;
-import com.example.splitt.group.dto.page.GroupPageFullDto;
 import com.example.splitt.group.service.GroupService;
-import com.example.splitt.util.model.CustomPageRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,7 +19,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -50,17 +46,6 @@ public class GroupController {
     public List<GroupOutputShortDto> getAllByUserId(@RequestHeader(REQUESTER_ID_HEADER) Long userId) {
         log.info("GET /groups | X-Requester-User-Id: {} ", userId);
         return groupService.findAllByUserId(userId);
-    }
-
-    @GetMapping("/{groupId}/page/full")
-    public GroupPageFullDto getGroupFullPageById(@RequestHeader(REQUESTER_ID_HEADER) Long requesterId,
-                                                 @PathVariable(name = "groupId") Long groupId,
-                                                 @RequestParam(name = "from", defaultValue = "0") int from,
-                                                 @RequestParam(name = "size", defaultValue = "10") int size) {
-        log.info("GET /groups/{}/page/full?from={}&size={} | X-Requester-User-Id: {} ",
-                groupId, from, size, requesterId);
-        return groupService.getGroupFullPageById(groupId, requesterId,
-                new CustomPageRequest(from, size, Sort.by(Sort.Direction.DESC, "t.date")));
     }
 
     @PostMapping

@@ -1,4 +1,4 @@
-package com.example.splitt.group.dto.page;
+package com.example.splitt.page.dto;
 
 import com.example.splitt.transaction.dto.transaction.TransactionOutShortDto;
 import com.example.splitt.util.balance.dto.UserBalanceOutDto;

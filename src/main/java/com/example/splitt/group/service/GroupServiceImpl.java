@@ -5,18 +5,10 @@ import com.example.splitt.group.dto.GroupOutputFullDto;
 import com.example.splitt.group.dto.GroupOutputShortDto;
 import com.example.splitt.group.dto.GroupUpdateDto;
 import com.example.splitt.group.dto.GroupUpdateMembersDto;
-import com.example.splitt.group.dto.page.GroupPageFullDto;
-import com.example.splitt.group.mapper.GroupPageMapper;
 import com.example.splitt.group.model.Group;
 import com.example.splitt.group.model.GroupMember;
 import com.example.splitt.group.model.GroupMemberId;
 import com.example.splitt.group.model.MemberStatus;
-import com.example.splitt.group.model.page.GroupPageFull;
-import com.example.splitt.transaction.model.entry.Entry;
-import com.example.splitt.transaction.model.entry.EntryType;
-import com.example.splitt.transaction.model.transaction.Transaction;
-import com.example.splitt.transaction.model.transaction.TransactionType;
-import com.example.splitt.transaction.repository.EntryRepository;
 import com.example.splitt.error.exception.CustomValidationException;
 import com.example.splitt.error.exception.EntityNotFoundException;
 import com.example.splitt.group.dto.member.MemberInputDto;
@@ -26,22 +18,23 @@ import com.example.splitt.group.mapper.GroupMapper;
 import com.example.splitt.group.mapper.GroupMapperLite;
 import com.example.splitt.group.repository.GroupMemberRepository;
 import com.example.splitt.group.repository.GroupRepository;
-import com.example.splitt.transaction.repository.TransactionRepository;
 import com.example.splitt.user.model.User;
 import com.example.splitt.user.repository.UserRepository;
 import com.example.splitt.util.SplittValidator;
-import com.example.splitt.util.balance.SplittCalculator;
-import com.example.splitt.util.balance.dto.UserBalanceOutDto;
-import com.example.splitt.util.balance.model.UserBalance;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @Transactional(readOnly = true)
@@ -58,19 +51,11 @@ public class GroupServiceImpl implements GroupService {
 
     private final UserRepository userRepository;
 
-    private final TransactionRepository transactionRepository;
-
-    private final EntryRepository entryRepository;
-
     private final SplittValidator splittValidator;
-
-    private final SplittCalculator splittCalculator;
 
     private final GroupMapper groupMapper;
 
     private final GroupMapperLite groupMapperLite;
-
-    private final GroupPageMapper groupPageMapper;
 
 
     @Override
@@ -84,32 +69,7 @@ public class GroupServiceImpl implements GroupService {
         List<GroupMember> foundGroupMembers = getMembersByGroupId(groupId);
         populateGroup(group, foundGroupMembers);
 
-        List<UserBalanceOutDto> groupBalances = countGroupBalances(groupId);
-
-        return groupMapper.toGroupOutputFullDto(group, groupBalances);
-    }
-
-    @Override
-    @Transactional
-    public GroupPageFullDto getGroupFullPageById(Long groupId, Long requesterId, Pageable pageable) {
-        GroupMemberId searchId = new GroupMemberId(requesterId, groupId);
-        GroupMember groupRequester = getGroupMemberById(searchId);
-        User requester = groupRequester.getMember();
-        Group group = groupRequester.getGroup();
-        updateLastViewedGroup(requester, group);
-
-        List<GroupMember> foundGroupMembers = getMembersByGroupId(groupId);
-        populateGroup(group, foundGroupMembers);
-        List<Transaction> transactions = getTransactionsByGroupId(groupId, pageable);
-
-        GroupPageFull groupPage = new GroupPageFull(requester, group, transactions);
-        GroupPageFullDto groupPageDto = groupPageMapper.toGroupPageFullDto(groupPage);
-
-        List<UserBalanceOutDto> groupBalancesDto = countGroupBalances(groupId);
-        groupPageDto.setBalances(groupBalancesDto);
-        setUserTransactionBalances(groupPage, groupPageDto);
-
-        return groupPageDto;
+        return groupMapper.toGroupOutputFullDto(group);
     }
 
     @Override
@@ -233,10 +193,6 @@ public class GroupServiceImpl implements GroupService {
         return userRepository.saveAll(newUsers);
     }
 
-    private List<UserBalance> getUserBalancesInGroup(Long groupId) {
-        return entryRepository.getUserBalancesInGroup(groupId);
-    }
-
     private void updateLastViewedGroup(User requester, Group group) {
 
         if (requester.getLastViewedGroup() != null &&
@@ -250,86 +206,6 @@ public class GroupServiceImpl implements GroupService {
     // ------------------
     // Auxiliary Methods
     // ------------------
-
-    private void setUserTransactionBalances(GroupPageFull groupPage,
-                                             GroupPageFullDto groupPageDto) {
-        List<Entry> userEntries = getTransactionEntriesForUser(groupPage.getUser().getId(),
-                groupPage.getTransactions());
-        if (userEntries.isEmpty()) return;
-
-        Map<Long, Integer> userTransactionBalances = new HashMap<>();
-
-        userEntries.forEach(entry -> {
-            Long transactionId = entry.getTransaction().getId();
-            int entryAmount = retrieveEntryAmount(entry);
-            userTransactionBalances.merge(transactionId, entryAmount, Integer::sum);
-        });
-
-        groupPageDto.getTransactions().forEach(transaction -> {
-            Integer userBalance = userTransactionBalances.get(transaction.getId());
-            // Note: userBalance can be null to indicate the user was not involved in the transaction
-            transaction.setCurrentUserBalance(userBalance);
-        });
-    }
-
-    private List<Entry> getTransactionEntriesForUser(long userId, List<Transaction> transactions) {
-        return transactions.stream()
-                .flatMap(transaction -> {
-                    if (transaction.getType() == TransactionType.EXPENSE) {
-                        return Stream.concat(
-                                transaction.getPayments().stream(),
-                                transaction.getSplitts().stream()
-                        );
-                    } else if (transaction.getType() == TransactionType.REPAYMENT) {
-                        return Stream.of(
-                                transaction.getRepaymentTo(),
-                                transaction.getRepaymentFrom()
-                        ).flatMap(Stream::ofNullable);
-                    } else {
-                        return Stream.empty();
-                    }
-                })
-                .filter(entry -> entry.getUserId() == userId)
-                .toList();
-    }
-
-
-    private List<Transaction> getTransactionsByGroupId(Long groupId, Pageable pageable) {
-        List<Transaction> transactions = transactionRepository.findAllByGroupId(groupId, pageable);
-        if (transactions.isEmpty()) return Collections.emptyList();
-
-        List<Entry> entries = getEntriesForTransactions(transactions);
-        entries.forEach(entry -> addEntryToTransaction(entry.getTransaction(), entry));
-
-        return transactions;
-    }
-
-    private List<Entry> getEntriesForTransactions(List<Transaction> transactions) {
-        List<Long> transactionIds = transactions.stream()
-                .map(Transaction::getId)
-                .toList();
-        return entryRepository.findAllByTransaction_IdIn(transactionIds);
-    }
-
-    private void addEntryToTransaction(Transaction transaction, Entry entry) {
-        switch (entry.getType()) {
-            case PAYMENT -> {
-                if (transaction.getPayments() == null) transaction.setPayments(new ArrayList<>());
-                transaction.getPayments().add(entry);
-            }
-            case DEBT -> {
-                if (transaction.getSplitts() == null) transaction.setSplitts(new ArrayList<>());
-                transaction.getSplitts().add(entry);
-            }
-            case REPAYMENT_TO -> transaction.setRepaymentTo(entry);
-            default -> transaction.setRepaymentFrom(entry);
-        }
-    }
-
-    private List<UserBalanceOutDto> countGroupBalances(Long groupId) {
-        List<UserBalance> userBalances = getUserBalancesInGroup(groupId);
-        return splittCalculator.calculateBalance(userBalances);
-    }
 
     private void populateGroup(Group group, List<GroupMember> groupMembers) {
         Set<User> members = groupMembers.stream()
@@ -424,7 +300,6 @@ public class GroupServiceImpl implements GroupService {
         group.setTitle(dto.getTitle());
     }
 
-
     private void updateCurrentGroupMembers(List<GroupMember> groupMembers,
                                            Group group,
                                            List<CurrentMemberInputDto> membersToUpdateDto) {
@@ -481,13 +356,6 @@ public class GroupServiceImpl implements GroupService {
                 .map(GroupMember::getMember)
                 .collect(Collectors.toCollection(LinkedHashSet::new));
         group.getMembers().addAll(newMembersSaved);
-    }
-
-    private int retrieveEntryAmount(Entry entry) {
-        return (EntryType.DEBT.equals(entry.getType()) ||
-                EntryType.REPAYMENT_FROM.equals(entry.getType()))
-                ? -entry.getAmount()
-                : entry.getAmount();
     }
 
     // -------------

@@ -25,7 +25,8 @@ public class GroupOutputFullDto {
 
     private List<UserOutputDto> members;
 
-    private List<UserBalanceOutDto> groupBalances;
+    //    TODO удалить потом
+//    private List<UserBalanceOutDto> groupBalances;
 
 //    TODO later
 //    private List<Bill> bills;
