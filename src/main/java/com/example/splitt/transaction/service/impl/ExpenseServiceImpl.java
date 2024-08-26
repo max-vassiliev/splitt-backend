@@ -107,7 +107,7 @@ public class ExpenseServiceImpl implements ExpenseService {
     }
 
     private GroupMember getGroupMember(Long groupId, Long userId) {
-        GroupMemberId searchId = new GroupMemberId(groupId, userId);
+        GroupMemberId searchId = new GroupMemberId(userId, groupId);
         return groupMemberRepository.findById(searchId)
                 .orElseThrow(() -> new EntityNotFoundException(
                         String.format("Group or User Not Found. May be one of the following: " +
