@@ -1,8 +1,6 @@
-package com.example.splitt.group.dto;
+package com.example.splitt.group.dto.member;
 
 import com.example.splitt.error.exception.CustomValidationException;
-import com.example.splitt.group.dto.member.CurrentMemberInputDto;
-import com.example.splitt.group.dto.member.NewMemberInputDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -1,7 +1,8 @@
-package com.example.splitt.group.dto;
+package com.example.splitt.group.dto.input;
 
-import com.example.splitt.group.dto.member.MemberInputDto;
-import com.example.splitt.group.dto.member.CurrentMemberInputDto;
+import com.example.splitt.group.dto.member.NewMemberInputDto;
+import com.example.splitt.util.validation.annotations.ValidAvatar;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,20 +17,16 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class GroupUpdateDto {
+public class GroupCreateDto {
 
-    private Long groupId;
-
-    private Long requesterId;
-
+    @NotBlank(message = "Group Title Is Empty. Please add group title.")
     @Size(max = 30, message = "Group Title Size Exceeded. The title must not exceed {max} characters.")
     private String title;
 
+    @ValidAvatar
     @Size(max = 50, message = "Group Avatar Name Size Exceeded. Must not exceed {max} characters.")
     private String avatar;
 
-    private List<CurrentMemberInputDto> currentMembers;
-
-    private List<MemberInputDto> newMembers;
+    private List<NewMemberInputDto> members;
 
 }

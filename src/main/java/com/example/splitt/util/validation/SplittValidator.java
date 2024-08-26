@@ -1,9 +1,6 @@
-package com.example.splitt.util;
+package com.example.splitt.util.validation;
 
-import com.example.splitt.error.exception.CustomValidationException;
 import com.example.splitt.user.model.User;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,13 +29,6 @@ public class SplittValidator {
 
     public boolean isUserRegistered(User user) {
         return user.getEmail() != null && user.getPassword() != null;
-    }
-
-    public void validateUserIsRegistered(User user) {
-        if (!isUserRegistered(user)) {
-            throw new CustomValidationException("User Not Registered. " +
-                    "Only registered users can perform this operation.");
-        }
     }
 
 }

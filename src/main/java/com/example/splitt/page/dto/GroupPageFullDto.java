@@ -1,6 +1,6 @@
 package com.example.splitt.page.dto;
 
-import com.example.splitt.group.dto.GroupOutputDto;
+import com.example.splitt.group.dto.output.GroupOutputDto;
 import com.example.splitt.user.dto.UserOutputDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

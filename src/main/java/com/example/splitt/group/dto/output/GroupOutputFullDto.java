@@ -1,4 +1,4 @@
-package com.example.splitt.group.dto;
+package com.example.splitt.group.dto.output;
 
 import com.example.splitt.user.dto.UserOutputDto;
 import com.example.splitt.util.balance.dto.UserBalanceOutDto;

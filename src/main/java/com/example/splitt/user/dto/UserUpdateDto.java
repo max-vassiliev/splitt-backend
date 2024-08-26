@@ -1,5 +1,7 @@
 package com.example.splitt.user.dto;
 
+import com.example.splitt.util.validation.annotations.AtLeastOneFieldNotNull;
+import com.example.splitt.util.validation.annotations.ValidAvatar;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -13,6 +15,10 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
+@AtLeastOneFieldNotNull(
+        fields = {"name", "email", "password", "avatar"},
+        message = "Either of these fields must be not null: {fields}"
+)
 public class UserUpdateDto {
 
     private String name;
@@ -24,6 +30,7 @@ public class UserUpdateDto {
             "Password must be between {min} and {max} characters long.")
     private String password;
 
+    @ValidAvatar
     @Size(max = 50, message = "User Avatar Name Size Exceeded. Must not exceed {max} characters.")
     private String avatar;
 

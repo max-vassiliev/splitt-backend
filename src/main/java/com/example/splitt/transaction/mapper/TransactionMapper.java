@@ -10,7 +10,7 @@ import com.example.splitt.transaction.model.transaction.Transaction;
 import com.example.splitt.util.balance.dto.UserBalanceOutDto;
 import com.example.splitt.util.balance.dto.UserSplittOutDto;
 import com.example.splitt.transaction.model.transaction.TransactionType;
-import com.example.splitt.util.SplittValidator;
+import com.example.splitt.util.validation.SplittValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -29,6 +29,7 @@ public class TransactionMapper {
     private final EntryMapperLite entryMapperLite;
 
     private final SplittValidator splittValidator;
+
 
     public Transaction toExpenseTransaction(ExpenseCreateDto dto, Long requesterId) {
         Transaction transaction = transactionMapperLite.toExpenseTransaction(dto);

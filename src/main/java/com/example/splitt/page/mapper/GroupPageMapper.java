@@ -1,6 +1,6 @@
 package com.example.splitt.page.mapper;
 
-import com.example.splitt.group.dto.GroupOutputDto;
+import com.example.splitt.group.dto.output.GroupOutputDto;
 import com.example.splitt.group.mapper.GroupMapperLite;
 import com.example.splitt.group.mapper.GroupMemberMapper;
 import com.example.splitt.page.dto.GroupPageDto;

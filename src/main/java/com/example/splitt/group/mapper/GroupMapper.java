@@ -1,6 +1,6 @@
 package com.example.splitt.group.mapper;
 
-import com.example.splitt.group.dto.GroupOutputFullDto;
+import com.example.splitt.group.dto.output.GroupOutputFullDto;
 import com.example.splitt.group.model.Group;
 import com.example.splitt.user.dto.UserOutputDto;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +17,7 @@ public class GroupMapper {
     private final GroupMapperLite groupMapperLite;
 
     private final GroupMemberMapper memberMapper;
+
 
     public GroupOutputFullDto toGroupOutputFullDto(Group group) {
         GroupOutputFullDto groupDto = groupMapperLite.toGroupOutputFullDto(group);

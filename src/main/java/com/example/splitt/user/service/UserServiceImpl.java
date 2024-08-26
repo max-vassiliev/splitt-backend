@@ -8,9 +8,8 @@ import com.example.splitt.user.dto.UserUpdateDto;
 import com.example.splitt.user.mapper.UserMapper;
 import com.example.splitt.user.model.User;
 import com.example.splitt.user.repository.UserRepository;
-import com.example.splitt.util.SplittValidator;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+import com.example.splitt.util.AppConstants;
+import com.example.splitt.util.validation.SplittValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,6 +25,7 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
 
     private final SplittValidator splittValidator;
+
 
     @Override
     @Transactional
@@ -85,6 +85,12 @@ public class UserServiceImpl implements UserService {
         }
         if (updateDto.getEmail() != null) {
             user.setEmail(updateDto.getEmail());
+        }
+        if (updateDto.getAvatar() != null) {
+            String updatedAvatar = updateDto.getAvatar().equals(AppConstants.DEFAULT_AVATAR)
+                    ? null
+                    : updateDto.getAvatar();
+            user.setAvatar(updatedAvatar);
         }
         if (updateDto.getPassword() != null) {
             user.setPassword(updateDto.getPassword());

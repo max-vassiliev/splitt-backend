@@ -1,4 +1,4 @@
-package com.example.splitt.group.dto;
+package com.example.splitt.group.dto.output;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

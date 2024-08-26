@@ -1,10 +1,11 @@
 package com.example.splitt.group.controller;
 
-import com.example.splitt.group.dto.GroupCreateDto;
-import com.example.splitt.group.dto.GroupOutputFullDto;
-import com.example.splitt.group.dto.GroupOutputShortDto;
-import com.example.splitt.group.dto.GroupUpdateDto;
-import com.example.splitt.group.dto.GroupUpdateMembersDto;
+import com.example.splitt.group.dto.input.GroupCreateDto;
+import com.example.splitt.group.dto.output.GroupOutputDto;
+import com.example.splitt.group.dto.output.GroupOutputFullDto;
+import com.example.splitt.group.dto.output.GroupOutputShortDto;
+import com.example.splitt.group.dto.input.GroupUpdateDto;
+import com.example.splitt.group.dto.member.GroupUpdateMembersDto;
 import com.example.splitt.group.service.GroupService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -57,9 +58,9 @@ public class GroupController {
     }
 
     @PatchMapping("/{groupId}")
-    public GroupOutputShortDto updateProperties(@PathVariable Long groupId,
-                                                @RequestHeader(REQUESTER_ID_HEADER) Long requesterId,
-                                                @Valid @RequestBody GroupUpdateDto dto) {
+    public GroupOutputDto updateProperties(@PathVariable Long groupId,
+                                           @RequestHeader(REQUESTER_ID_HEADER) Long requesterId,
+                                           @Valid @RequestBody GroupUpdateDto dto) {
         log.info("PATCH /groups/{} | X-Requester-User-Id: {} | Request Body: {}",
                 groupId, requesterId, dto);
         dto.setGroupId(groupId);

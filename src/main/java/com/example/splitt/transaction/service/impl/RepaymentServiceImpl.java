@@ -16,7 +16,7 @@ import com.example.splitt.group.model.GroupMember;
 import com.example.splitt.group.model.GroupMemberId;
 import com.example.splitt.group.repository.GroupMemberRepository;
 import com.example.splitt.user.model.User;
-import com.example.splitt.util.SplittValidator;
+import com.example.splitt.util.validation.SplittValidator;
 import com.example.splitt.util.balance.SplittCalculator;
 import com.example.splitt.util.balance.dto.UserBalanceOutDto;
 import com.example.splitt.util.balance.model.UserBalance;

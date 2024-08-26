@@ -1,5 +1,6 @@
 package com.example.splitt.user.dto;
 
+import com.example.splitt.util.validation.annotations.ValidAvatar;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -26,6 +27,7 @@ public class NewUserRequestDto {
             "Password must be between {min} and {max} characters long.")
     private String password;
 
+    @ValidAvatar
     @Size(max = 50, message = "User Avatar Name Size Exceeded. Must not exceed {max} characters.")
     private String avatar;
 

@@ -12,7 +12,6 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
@@ -25,7 +24,6 @@ import java.util.Set;
 @Table(name = "groups", schema = "public")
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
 public class Group {
 
@@ -47,6 +45,13 @@ public class Group {
 
     @Transient
     private List<Entry> entries;
+
+
+    public Group() {
+        this.members = new HashSet<>();
+        this.transactions = new ArrayList<>();
+        this.entries = new ArrayList<>();
+    }
 
     public Group(String title) {
         this.title = title;

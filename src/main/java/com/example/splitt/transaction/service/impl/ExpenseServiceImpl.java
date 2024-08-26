@@ -21,7 +21,7 @@ import com.example.splitt.group.model.GroupMemberId;
 import com.example.splitt.group.repository.GroupMemberRepository;
 import com.example.splitt.user.model.User;
 import com.example.splitt.user.repository.UserRepository;
-import com.example.splitt.util.SplittValidator;
+import com.example.splitt.util.validation.SplittValidator;
 import com.example.splitt.util.balance.model.UserBalance;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;

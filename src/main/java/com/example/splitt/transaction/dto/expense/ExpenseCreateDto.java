@@ -40,7 +40,6 @@ public class ExpenseCreateDto {
     @JsonDeserialize(using = StrictIntegerDeserializer.class)
     private Integer amount;
 
-    @Size(max = 2, message = "Emoji Size Exceeded. The field should contain a maximum of 2 characters.")
     private String emoji;
 
     @NotBlank(message = "Expense Date Missing. Please add the date the expense was made.")

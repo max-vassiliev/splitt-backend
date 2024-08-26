@@ -1,10 +1,11 @@
 package com.example.splitt.group.service;
 
-import com.example.splitt.group.dto.GroupCreateDto;
-import com.example.splitt.group.dto.GroupOutputFullDto;
-import com.example.splitt.group.dto.GroupOutputShortDto;
-import com.example.splitt.group.dto.GroupUpdateDto;
-import com.example.splitt.group.dto.GroupUpdateMembersDto;
+import com.example.splitt.group.dto.input.GroupCreateDto;
+import com.example.splitt.group.dto.output.GroupOutputDto;
+import com.example.splitt.group.dto.output.GroupOutputFullDto;
+import com.example.splitt.group.dto.output.GroupOutputShortDto;
+import com.example.splitt.group.dto.input.GroupUpdateDto;
+import com.example.splitt.group.dto.member.GroupUpdateMembersDto;
 import com.example.splitt.group.model.Group;
 import com.example.splitt.group.model.GroupMember;
 import com.example.splitt.group.model.GroupMemberId;
@@ -20,7 +21,8 @@ import com.example.splitt.group.repository.GroupMemberRepository;
 import com.example.splitt.group.repository.GroupRepository;
 import com.example.splitt.user.model.User;
 import com.example.splitt.user.repository.UserRepository;
-import com.example.splitt.util.SplittValidator;
+import com.example.splitt.util.AppConstants;
+import com.example.splitt.util.validation.SplittValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -92,7 +94,7 @@ public class GroupServiceImpl implements GroupService {
 
         List<User> members = processGroupMembers(dto.getMembers());
 
-        Group group = new Group(dto.getTitle());
+        Group group = groupMapperLite.toGroup(dto);
         Group savedGroup = saveNewGroup(group);
 
         List<GroupMember> groupMembers = createGroupMembers(savedGroup, requester, members);
@@ -107,9 +109,7 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     @Transactional
-    public GroupOutputShortDto updateProperties(GroupUpdateDto dto) {
-        validateUpdatePropertiesNotNull(dto);
-
+    public GroupOutputDto updateProperties(GroupUpdateDto dto) {
         GroupMemberId searchId = new GroupMemberId(dto.getRequesterId(), dto.getGroupId());
         GroupMember groupRequester = getGroupMemberById(searchId);
         validateRequesterIsRegistered(groupRequester.getMember());
@@ -119,7 +119,7 @@ public class GroupServiceImpl implements GroupService {
 
         groupRepository.flush();
 
-        return groupMapperLite.toGroupOutputShortDto(group);
+        return groupMapperLite.toGroupOutputDto(group);
     }
 
     @Override
@@ -228,10 +228,10 @@ public class GroupServiceImpl implements GroupService {
         List<User> newUsers = extractNewUsers(memberDtos, members);
         List<User> newUsersSaved = saveNewUsers(newUsers);
         members.addAll(newUsersSaved);
-        
+
         return members;
     }
-    
+
     private List<User> extractExistingUsers(List<NewMemberInputDto> membersDtos) {
         List<String> membersEmails = membersDtos.stream()
                 .map(MemberInputDto::getEmail)
@@ -240,7 +240,7 @@ public class GroupServiceImpl implements GroupService {
 
         return getUsersByEmails(membersEmails);
     }
-    
+
     private List<User> extractNewUsers(List<NewMemberInputDto> memberDtos, List<User> members) {
         List<User> newUsers = new ArrayList<>();
 
@@ -295,9 +295,16 @@ public class GroupServiceImpl implements GroupService {
     }
 
     private void updateGroupProperties(Group group, GroupUpdateDto dto) {
-        if (dto.getTitle() == null) return;
-        validateGroupTitleNotEmpty(dto.getTitle());
-        group.setTitle(dto.getTitle());
+        if (dto.getTitle() != null) {
+            validateGroupTitleNotEmpty(dto.getTitle());
+            group.setTitle(dto.getTitle());
+        }
+        if (dto.getAvatar() != null) {
+            String updatedAvatar = dto.getAvatar().equals(AppConstants.DEFAULT_AVATAR)
+                    ? null
+                    : dto.getAvatar();
+            group.setAvatar(updatedAvatar);
+        }
     }
 
     private void updateCurrentGroupMembers(List<GroupMember> groupMembers,
@@ -404,13 +411,6 @@ public class GroupServiceImpl implements GroupService {
         if (!splittValidator.isUserRegistered(requester)) {
             throw new CustomValidationException("User Not Registered. " +
                     "Only registered users can manage groups.");
-        }
-    }
-
-    private void validateUpdatePropertiesNotNull(GroupUpdateDto dto) {
-        if (dto.getTitle() == null) {
-            throw new CustomValidationException("Nothing to Update. " +
-                    "Please add group properties that you would like to update.");
         }
     }
 
