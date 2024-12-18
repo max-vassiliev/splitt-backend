@@ -27,16 +27,12 @@ public class RepaymentOutDto extends TransactionOutDto {
 
     private String addedOn;
 
-//    private UserOutShortDto payer;
     private Long payerId;
 
-//    private UserOutShortDto recipient;
     private Long recipientId;
 
-//    private UserOutShortDto addedBy;
     private Long addedByUserId;
 
-    // TODO удалить
     private List<UserBalanceOutDto> groupBalances;
 
 }

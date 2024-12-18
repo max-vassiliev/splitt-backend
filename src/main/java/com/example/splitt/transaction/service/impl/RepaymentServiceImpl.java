@@ -1,9 +1,13 @@
 package com.example.splitt.transaction.service.impl;
 
+import com.example.splitt.error.exception.DatabaseValidationException;
 import com.example.splitt.transaction.dto.repayment.RepaymentCreateDto;
+import com.example.splitt.transaction.dto.repayment.RepaymentOutBasicDto;
 import com.example.splitt.transaction.dto.repayment.RepaymentOutDto;
+import com.example.splitt.transaction.dto.transaction.GetTransactionParams;
 import com.example.splitt.transaction.mapper.TransactionMapper;
 import com.example.splitt.transaction.mapper.EntryMapper;
+import com.example.splitt.transaction.model.entry.EntryType;
 import com.example.splitt.transaction.model.transaction.Transaction;
 import com.example.splitt.transaction.model.entry.Entry;
 import com.example.splitt.transaction.repository.TransactionRepository;
@@ -56,7 +60,7 @@ public class RepaymentServiceImpl implements RepaymentService {
         // Validate and retrieve data
 
         validatePayerNotRecipient(dto);
-        
+
         List<GroupMember> groupMembers = findGroupMembersInCreateDto(dto);
         validateGroupMembersNotEmpty(groupMembers);
         User requester = extractRequesterBeforeAdd(groupMembers, dto.getRequesterId());
@@ -88,11 +92,31 @@ public class RepaymentServiceImpl implements RepaymentService {
         return transactionMapper.toRepaymentOutDto(savedTransaction, groupBalances);
     }
 
+    @Override
+    public RepaymentOutBasicDto getById(GetTransactionParams params) {
+        validateGroupMember(params.getGroupId(), params.getRequesterId());
+        Transaction repayment = getRepaymentById(params.getTransactionId());
+        addEntriesToRepayment(repayment);
+        Long repaymentGroupId = repayment.getRepaymentTo().getGroup().getId();
+        validateRepaymentGroup(params.getGroupId(), repaymentGroupId);
+        return transactionMapper.toRepaymentOutBasicDto(repayment);
+    }
+
     /*
      -------------
      Repository
      -------------
     */
+
+    private Transaction getRepaymentById(Long id) {
+        return transactionRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(
+                String.format("Repayment not found for id=%d", id), Transaction.class
+        ));
+    }
+
+    private List<Entry> getRepaymentEntries(Long repaymentId) {
+        return entryRepository.findAllByTransaction_Id(repaymentId);
+    }
 
     private List<GroupMember> findGroupMembersInCreateDto(RepaymentCreateDto dto) {
         Set<Long> usersIds = new HashSet<>();
@@ -141,6 +165,35 @@ public class RepaymentServiceImpl implements RepaymentService {
         return requester;
     }
 
+    private void addEntriesToRepayment(Transaction repayment) {
+        List<Entry> retrievedEntries = getRepaymentEntries(repayment.getId());
+        validateEntriesSize(retrievedEntries);
+        populateEntries(retrievedEntries, repayment);
+    }
+
+    private void populateEntries(List<Entry> entries, Transaction repayment) {
+        validateEntriesSize(entries);
+
+        boolean hasRepaymentTo = false;
+        boolean hasRepaymentFrom = false;
+
+        for (Entry entry : entries) {
+            if (EntryType.REPAYMENT_TO.equals(entry.getType())) {
+                hasRepaymentTo = true;
+                repayment.setRepaymentTo(entry);
+            }
+            if (EntryType.REPAYMENT_FROM.equals(entry.getType())) {
+                hasRepaymentFrom = true;
+                repayment.setRepaymentFrom(entry);
+            }
+        }
+
+        if (!hasRepaymentTo || !hasRepaymentFrom) {
+            throw new DatabaseValidationException("Missing entry types for repayment. " +
+                    "Retrieved entries: " + entries);
+        }
+    }
+
     /*
      -------------
      Validation
@@ -153,7 +206,7 @@ public class RepaymentServiceImpl implements RepaymentService {
                     "Users cannot record repayments to themselves.");
         }
     }
-    
+
     private void validateRequesterIsRegistered(User requester) {
         if (!splittValidator.isUserRegistered(requester)) {
             throw new CustomValidationException("User Not Registered. " +
@@ -161,11 +214,40 @@ public class RepaymentServiceImpl implements RepaymentService {
         }
     }
 
+    private void validateGroupMember(Long groupId, Long userId) {
+        groupMemberRepository.findById(new GroupMemberId(userId, groupId))
+                .orElseThrow(
+                        () -> new CustomValidationException(
+                                String.format("Group-User Pair Not Found. May be one of the following: " +
+                                        "a) group with ID=%d does not exist; " +
+                                        "b) user with ID=%d does not exist " +
+                                        "or does not have access to the group", groupId, userId)
+                        ));
+    }
+
     private void validateGroupMembersNotEmpty(List<GroupMember> groupMembers) {
         if (groupMembers.isEmpty()) {
             throw new EntityNotFoundException("Group or Users Not Found. " +
                     "No match for group and users with provided IDs.",
                     GroupMember.class);
+        }
+    }
+
+    private void validateRepaymentGroup(long inputGroupId, long repaymentGroupId) {
+        if (inputGroupId != repaymentGroupId) {
+            throw new CustomValidationException(
+                    String.format("Provided group ID (%d) does not match with the repayment group ID",
+                            inputGroupId));
+        }
+    }
+
+    private void validateEntriesSize(List<Entry> entries) {
+        if (entries.isEmpty()) {
+            throw new DatabaseValidationException("Repayment entries not found.");
+        }
+        if (entries.size() != 2) {
+            throw new DatabaseValidationException("Invalid number of entries for repayment. " +
+                    "Expected 2, found: " + entries.size());
         }
     }
 }

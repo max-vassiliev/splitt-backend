@@ -4,6 +4,7 @@ import com.example.splitt.transaction.dto.expense.ExpenseOutDto;
 import com.example.splitt.transaction.dto.expense.ExpenseCreateDto;
 import com.example.splitt.transaction.dto.expense.ExpenseOutShortDto;
 import com.example.splitt.transaction.dto.repayment.RepaymentCreateDto;
+import com.example.splitt.transaction.dto.repayment.RepaymentOutBasicDto;
 import com.example.splitt.transaction.dto.repayment.RepaymentOutDto;
 import com.example.splitt.transaction.dto.repayment.RepaymentOutShortDto;
 import com.example.splitt.transaction.model.transaction.SplittType;
@@ -42,6 +43,12 @@ public interface TransactionMapperLite {
     @Mapping(target = "date", source = "date", dateFormat = SPLITT_DATE_FORMAT)
     @Mapping(target = "addedOn", source = "addedOn", dateFormat = SPLITT_DATE_TIME_FORMAT)
     RepaymentOutDto toRepaymentOutDto(Transaction repayment);
+
+    @Mapping(target = "payerId", source = "repayment.repaymentFrom.userId")
+    @Mapping(target = "recipientId", source = "repayment.repaymentTo.userId")
+    @Mapping(target = "addedBy", source = "addedByUserId")
+    @Mapping(target = "date", source = "date", dateFormat = SPLITT_DATE_FORMAT)
+    RepaymentOutBasicDto toRepaymentOutBasicDto(Transaction repayment);
 
     @Mapping(target = "date", source = "date", dateFormat = SPLITT_DATE_FORMAT)
     @Mapping(target = "type", source = "type", qualifiedByName = "mapTransactionTypeToString")
