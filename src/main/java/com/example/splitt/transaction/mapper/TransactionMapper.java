@@ -3,6 +3,7 @@ package com.example.splitt.transaction.mapper;
 import com.example.splitt.transaction.dto.expense.ExpenseOutDto;
 import com.example.splitt.transaction.dto.expense.ExpenseCreateDto;
 import com.example.splitt.transaction.dto.repayment.RepaymentCreateDto;
+import com.example.splitt.transaction.dto.repayment.RepaymentOutBasicDto;
 import com.example.splitt.transaction.dto.repayment.RepaymentOutDto;
 import com.example.splitt.transaction.dto.transaction.TransactionOutShortDto;
 import com.example.splitt.transaction.model.transaction.SplittType;
@@ -91,6 +92,10 @@ public class TransactionMapper {
         outputDto.setGroupBalances(groupBalances);
 
         return outputDto;
+    }
+
+    public RepaymentOutBasicDto toRepaymentOutBasicDto(Transaction repayment) {
+        return transactionMapperLite.toRepaymentOutBasicDto(repayment);
     }
 
     public TransactionOutShortDto toTransactionOutShortDto(Transaction transaction) {

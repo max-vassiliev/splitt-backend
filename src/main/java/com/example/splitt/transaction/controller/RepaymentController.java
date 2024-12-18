@@ -1,13 +1,16 @@
 package com.example.splitt.transaction.controller;
 
 import com.example.splitt.transaction.dto.repayment.RepaymentCreateDto;
+import com.example.splitt.transaction.dto.repayment.RepaymentOutBasicDto;
 import com.example.splitt.transaction.dto.repayment.RepaymentOutDto;
+import com.example.splitt.transaction.dto.transaction.GetTransactionParams;
 import com.example.splitt.transaction.service.RepaymentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,6 +29,19 @@ public class RepaymentController {
     private static final String REQUESTER_ID_HEADER = "X-Requester-User-Id";
 
     private final RepaymentService repaymentService;
+
+
+    @GetMapping("/{repaymentId}")
+    public RepaymentOutBasicDto getById(@PathVariable(name = "repaymentId") Long repaymentId,
+                                        @PathVariable(name = "groupId") Long groupId,
+                                        @RequestHeader(REQUESTER_ID_HEADER) Long requesterId) {
+        log.info("GET /groups/{}/repayments/{} | X-Requester-User-Id: {}", groupId, repaymentId, requesterId);
+        GetTransactionParams params = new GetTransactionParams();
+        params.setTransactionId(repaymentId);
+        params.setGroupId(groupId);
+        params.setRequesterId(requesterId);
+        return repaymentService.getById(params);
+    }
 
     @PostMapping
     public RepaymentOutDto add(@PathVariable(name = "groupId") Long groupId,
